@@ -127,7 +127,7 @@ void main() {
       await tester.tap(find.byIcon(Icons.add));
       expect(fabTapped, isTrue);
 
-      await tester.tap(find.byIcon(Icons.layers_outlined));
+      await tester.tap(find.byIcon(Icons.receipt_outlined));
       expect(tapped, 1);
     });
 

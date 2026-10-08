@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -138,11 +139,9 @@ class QuickManagementModal extends ConsumerWidget {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Switch.adaptive(
+                      CupertinoSwitch(
                         value: isDeliveryEnabled,
-                        activeThumbColor: AppColors.success,
-                        activeTrackColor: AppColors.success.withValues(alpha: 0.35),
-                        inactiveThumbColor: AppColors.textSecondary,
+                        activeTrackColor: AppColors.success,
                         onChanged: (_) {
                           ref.read(deliverySettingsControllerProvider.notifier).toggleDelivery();
                         },

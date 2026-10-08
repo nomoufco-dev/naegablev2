@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
@@ -659,14 +660,35 @@ class _TransactionHistoryScreenState
                 ),
                 const SizedBox(height: 2.0),
 
-                // Nomor Transaksi (Medium Bold Black)
-                Text(
-                  order.orderNumber,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.noir,
-                  ),
+                // Nomor Transaksi (Medium Bold Black) + Copy Icon
+                Row(
+                  children: [
+                    Text(
+                      order.orderNumber,
+                      style: const TextStyle(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.noir,
+                      ),
+                    ),
+                    const SizedBox(width: 6.0),
+                    GestureDetector(
+                      onTap: () {
+                        Clipboard.setData(ClipboardData(text: order.orderNumber));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Nomor TRX disalin: ${order.orderNumber}'),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      },
+                      child: const Icon(
+                        Icons.copy_outlined,
+                        size: 16.0,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 4.0),
 

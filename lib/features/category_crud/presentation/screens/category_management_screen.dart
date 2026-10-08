@@ -126,7 +126,26 @@ class CategoryManagementScreen extends ConsumerWidget {
       body: categoriesAsync.when(
         data: (categories) {
           if (categories.isEmpty) {
-            return const Center(child: Text('Belum ada kategori.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.category_outlined,
+                    size: 64.0,
+                    color: AppColors.textSecondary.withValues(alpha: 0.5),
+                  ),
+                  const SizedBox(height: 12.0),
+                  const Text(
+                    'Belum ada kategori.',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            );
           }
 
           return ListView.separated(

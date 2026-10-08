@@ -149,7 +149,7 @@ void main() {
     expect(find.byType(PosAppBar), findsOneWidget);
     expect(find.text('Kasir'), findsOneWidget);
     expect(find.byIcon(Icons.search), findsOneWidget);
-    expect(find.byIcon(Icons.shopping_cart_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.shopping_cart_outlined), findsAtLeast(1));
 
     // 2. Verify Category Filter Bar and Grid Toggle Button
     expect(find.byType(CategoryFilterBar), findsOneWidget);
@@ -168,9 +168,9 @@ void main() {
       matching: find.byIcon(Icons.add),
     );
     expect(navFabFinder, findsOneWidget);
-    expect(find.byIcon(Icons.storefront_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.layers_outlined), findsOneWidget);
-    expect(find.byIcon(Icons.history_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.shopping_cart_outlined), findsAtLeast(1));
+    expect(find.byIcon(Icons.receipt_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.description_outlined), findsOneWidget);
     expect(find.byIcon(Icons.bar_chart_outlined), findsOneWidget);
 
     // 5. Tap Center FAB (+) to trigger Quick Management Modal

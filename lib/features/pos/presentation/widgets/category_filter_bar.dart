@@ -75,6 +75,7 @@ class CategoryFilterBar extends StatelessWidget {
                   final isSelected = selectedCategoryId == null;
                   return _buildCategoryChip(
                     label: 'Semua Menu',
+                    icon: Icons.format_list_bulleted,
                     isSelected: isSelected,
                     onTap: () => onCategorySelected(null),
                   );
@@ -99,6 +100,7 @@ class CategoryFilterBar extends StatelessWidget {
     required String label,
     required bool isSelected,
     required VoidCallback onTap,
+    IconData? icon,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -124,13 +126,26 @@ class CategoryFilterBar extends StatelessWidget {
               : null,
         ),
         alignment: Alignment.center,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12.0,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-            color: AppColors.noir,
-          ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (icon != null) ...[
+              Icon(
+                icon,
+                size: 16.0,
+                color: AppColors.noir,
+              ),
+              const SizedBox(width: 4.0),
+            ],
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                color: AppColors.noir,
+              ),
+            ),
+          ],
         ),
       ),
     );

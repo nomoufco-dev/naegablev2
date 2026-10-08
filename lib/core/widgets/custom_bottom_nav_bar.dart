@@ -59,19 +59,19 @@ class CustomBottomNavBar extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     _buildNavItem(
-                      icon: Icons.storefront_outlined,
+                      icon: Icons.shopping_cart_outlined,
                       tooltip: 'Kasir',
                       index: 0,
                     ),
                     _buildNavItem(
-                      icon: Icons.layers_outlined,
-                      tooltip: 'Katalog & Kelola',
+                      icon: Icons.receipt_outlined,
+                      tooltip: 'Daftar Pesanan',
                       index: 1,
                     ),
                     const SizedBox(width: 72.0), // Gap area tengah dengan margin lengkungan
                     _buildNavItem(
-                      icon: Icons.history_outlined,
-                      tooltip: 'Riwayat Transaksi',
+                      icon: Icons.description_outlined,
+                      tooltip: 'Dokumen',
                       index: 2,
                     ),
                     _buildNavItem(

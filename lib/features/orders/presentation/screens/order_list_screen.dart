@@ -388,7 +388,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                     GestureDetector(
                       onTap: () => _copyTrxCode(order.orderNumber),
                       child: const Icon(
-                        Icons.copy,
+                        Icons.copy_outlined,
                         size: 16.0,
                         color: AppColors.primary,
                       ),
