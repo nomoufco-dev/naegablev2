@@ -302,7 +302,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
     final queueNumber = (index + 1).toString().padLeft(2, '0');
     final orderDateTime = order.createdAt ?? DateTime.now();
     final pickupDateTime = orderDateTime.add(const Duration(hours: 1));
-    final isUnpaid = order.orderStatus == 'pending' || order.paymentMethod == 'unpaid';
+    final isNewOrder = order.orderStatus != 'cancelled';
 
     return Container(
       decoration: BoxDecoration(
@@ -334,7 +334,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                         borderRadius: BorderRadius.circular(9999),
                       ),
                       child: Text(
-                        order.orderStatus == 'cancelled' ? 'Pesanan Dibatalkan' : 'Pesanan Baru',
+                        isNewOrder ? 'Pesanan Baru' : 'Pesanan Dibatalkan',
                         style: const TextStyle(
                           fontSize: 11.0,
                           fontWeight: FontWeight.bold,
@@ -343,12 +343,20 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                       ),
                     ),
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
+                          padding: const EdgeInsets.all(4.0),
+                          constraints: const BoxConstraints(),
+                          visualDensity: VisualDensity.compact,
                           icon: const Icon(Icons.more_vert, size: 20.0, color: AppColors.primary),
                           onPressed: () => _showActionSheet(context, order),
                         ),
+                        const SizedBox(width: 4.0),
                         IconButton(
+                          padding: const EdgeInsets.all(4.0),
+                          constraints: const BoxConstraints(),
+                          visualDensity: VisualDensity.compact,
                           icon: Icon(
                             isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
                             size: 22.0,
@@ -447,7 +455,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
 
                 const Divider(height: 20.0, color: Color(0xFFEAE5E0)),
 
-                // Total Hijau & Tombol "Bayar" Cokelat jika belum bayar
+                // Total Hijau & Tombol "Bayar" Cokelat untuk Pesanan Baru
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -471,7 +479,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                         ),
                       ],
                     ),
-                    if (isUnpaid)
+                    if (isNewOrder)
                       ElevatedButton(
                         onPressed: () {
                           context.push(
