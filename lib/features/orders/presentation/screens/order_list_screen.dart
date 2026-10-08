@@ -13,7 +13,7 @@ import '../../../pos/presentation/controllers/pos_controller.dart';
 /// Layar Daftar Pesanan Naegablé Bakehaus sesuai spesifikasi Figma (DESIGN_SPEC_FIGMA.md):
 /// Header + search + ikon trash, kartu expandable (chip pink "Pesanan Baru",
 /// nama pelanggan, TRX + ikon copy, tanggal & antrian, jadwal pengambilan, rincian item,
-/// total hijau, tombol "Bayar" cokelat, menu ⋮ -> action sheet "Struk Pesanan"/"Batalkan Pesanan").
+/// total pesanan, total hijau, tombol "Bayar" cokelat pill + menu ⋮ kotak putih di baris bawah).
 class OrderListScreen extends ConsumerStatefulWidget {
   const OrderListScreen({super.key});
 
@@ -194,14 +194,13 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
       final repo = ref.read(orderRepositoryProvider);
       await repo.updateOrderStatus(order.id, 'cancelled');
       ref.invalidate(ordersListProvider);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Pesanan ${order.orderNumber} berhasil dibatalkan'),
             backgroundColor: AppColors.primary,
           ),
         );
-      }
     }
   }
 
@@ -323,7 +322,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Baris: Chip "Pesanan Baru", Nama, Icon Overflow Menu
+                // Header Baris: Chip "Pesanan Baru" & Chevron Expand (Tanpa ⋮)
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -342,29 +341,16 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                         ),
                       ),
                     ),
-                    Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          padding: const EdgeInsets.all(4.0),
-                          constraints: const BoxConstraints(),
-                          visualDensity: VisualDensity.compact,
-                          icon: const Icon(Icons.more_vert, size: 20.0, color: AppColors.primary),
-                          onPressed: () => _showActionSheet(context, order),
-                        ),
-                        const SizedBox(width: 4.0),
-                        IconButton(
-                          padding: const EdgeInsets.all(4.0),
-                          constraints: const BoxConstraints(),
-                          visualDensity: VisualDensity.compact,
-                          icon: Icon(
-                            isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                            size: 22.0,
-                            color: AppColors.primary,
-                          ),
-                          onPressed: () => _toggleExpand(order.id),
-                        ),
-                      ],
+                    IconButton(
+                      padding: const EdgeInsets.all(4.0),
+                      constraints: const BoxConstraints(),
+                      visualDensity: VisualDensity.compact,
+                      icon: Icon(
+                        isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        size: 22.0,
+                        color: AppColors.primary,
+                      ),
+                      onPressed: () => _toggleExpand(order.id),
                     ),
                   ],
                 ),
@@ -451,61 +437,127 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                           ],
                         ),
                       )),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Total Pesanan',
+                        style: TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.noir,
+                        ),
+                      ),
+                      Text(
+                        CurrencyFormatter.format(order.totalAmount),
+                        style: const TextStyle(
+                          fontSize: 13.0,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.noir,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
 
                 const Divider(height: 20.0, color: Color(0xFFEAE5E0)),
 
-                // Total Hijau & Tombol "Bayar" Cokelat untuk Pesanan Baru
+                // Baris Total (Bold) / Nominal HIJAU Bold
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Total',
-                          style: TextStyle(
-                            fontSize: 12.0,
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                        Text(
-                          CurrencyFormatter.format(order.totalAmount),
-                          style: const TextStyle(
-                            fontSize: 17.0,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF2E9E5B),
-                          ),
-                        ),
-                      ],
+                    const Text(
+                      'Total',
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.noir,
+                      ),
                     ),
+                    Text(
+                      CurrencyFormatter.format(order.totalAmount),
+                      style: const TextStyle(
+                        fontSize: 17.0,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF2E9E5B),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14.0),
+
+                // Baris Bawah: [Tombol Bayar Cokelat Lebar] [Tombol Kotak Putih ⋮]
+                Row(
+                  children: [
                     if (isNewOrder)
-                      ElevatedButton(
-                        onPressed: () {
-                          context.push(
-                            '/payment',
-                            extra: {
-                              'totalAmount': order.totalAmount,
-                              'customerName': customerName,
+                      Expanded(
+                        child: SizedBox(
+                          height: 44.0,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.push(
+                                '/payment',
+                                extra: {
+                                  'totalAmount': order.totalAmount,
+                                  'customerName': customerName,
+                                },
+                              );
                             },
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: AppColors.surfaceWhite,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(9999),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: AppColors.surfaceWhite,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(9999),
+                              ),
+                            ),
+                            child: const Text(
+                              'Bayar',
+                              style: TextStyle(
+                                fontSize: 14.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
-                          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
                         ),
-                        child: const Text(
-                          'Bayar',
-                          style: TextStyle(
-                            fontSize: 13.5,
-                            fontWeight: FontWeight.bold,
+                      )
+                    else
+                      const Spacer(),
+                    const SizedBox(width: 10.0),
+                    SizedBox(
+                      width: 44.0,
+                      height: 44.0,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceWhite,
+                          borderRadius: BorderRadius.circular(12.0),
+                          border: Border.all(color: const Color(0xFFE5E5E5), width: 1.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x0A000000),
+                              blurRadius: 4.0,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () => _showActionSheet(context, order),
+                            borderRadius: BorderRadius.circular(12.0),
+                            child: const Center(
+                              child: Icon(
+                                Icons.more_vert,
+                                color: Colors.black,
+                                size: 20.0,
+                              ),
+                            ),
                           ),
                         ),
                       ),
+                    ),
                   ],
                 ),
               ],
