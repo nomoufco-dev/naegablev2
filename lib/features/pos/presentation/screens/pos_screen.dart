@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/widgets/custom_bottom_nav_bar.dart';
@@ -191,9 +192,22 @@ class _PosScreenState extends ConsumerState<PosScreen> with SingleTickerProvider
                 isCloseState: _notchMorphAnimation.value > 0.5,
                 onItemSelected: (index) {
                   if (_isQuickManagementOpen) _closeQuickManagementSheet();
-                  setState(() {
-                    _currentTabIndex = index;
-                  });
+                  switch (index) {
+                    case 0:
+                      setState(() {
+                        _currentTabIndex = 0;
+                      });
+                      break;
+                    case 1:
+                      context.go('/orders');
+                      break;
+                    case 2:
+                      context.go('/history');
+                      break;
+                    case 3:
+                      context.go('/reports');
+                      break;
+                  }
                 },
                 onFabPressed: () {
                   if (_isQuickManagementOpen) {

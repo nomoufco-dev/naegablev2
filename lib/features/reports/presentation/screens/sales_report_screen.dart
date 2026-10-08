@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/di/providers.dart';
@@ -27,7 +28,17 @@ class SalesReportScreen extends ConsumerWidget {
         title: const Text('Laporan & Statistik'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnDark,
-        automaticallyImplyLeading: false,
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18.0),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/pos');
+            }
+          },
+        ),
       ),
       body: summaryAsync.when(
         data: (summary) {

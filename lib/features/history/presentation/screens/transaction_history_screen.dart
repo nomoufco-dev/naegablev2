@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/di/providers.dart';
@@ -262,7 +263,6 @@ class _TransactionHistoryScreenState
   @override
   Widget build(BuildContext context) {
     final ordersAsync = ref.watch(ordersListProvider);
-    final canPop = Navigator.of(context).canPop();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -296,17 +296,22 @@ class _TransactionHistoryScreenState
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        if (canPop)
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_back_ios_new,
-                                  color: AppColors.surfaceWhite, size: 20.0),
-                              onPressed: () => Navigator.of(context).pop(),
-                              padding: EdgeInsets.zero,
-                              constraints: const BoxConstraints(),
-                            ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: IconButton(
+                            icon: const Icon(Icons.arrow_back_ios_new,
+                                color: AppColors.surfaceWhite, size: 20.0),
+                            onPressed: () {
+                              if (Navigator.of(context).canPop()) {
+                                Navigator.of(context).pop();
+                              } else {
+                                context.go('/pos');
+                              }
+                            },
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
                           ),
+                        ),
                         const SizedBox(
                           height: 36.0,
                           child: Center(
