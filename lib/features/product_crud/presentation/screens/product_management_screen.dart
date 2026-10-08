@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/di/providers.dart';
 import '../../../../core/domain/entities/product_entity.dart';
 import '../../../../core/utils/currency_formatter.dart';
-import 'package:pos_naegable/features/pos/presentation/controllers/pos_controller.dart';
+import '../../../pos/presentation/controllers/pos_controller.dart';
+import 'product_form_screen.dart';
 
-/// Layar CRUD Kelola Produk Bakery Naegablé.
+/// Layar Daftar Produk Naegablé Bakehaus sesuai spesifikasi Figma (DESIGN_SPEC_FIGMA.md):
+/// Kartu produk: foto kiri, nama, "Beli Rp14.000 / Jual Rp28.000 / Stok: 99",
+/// tombol "Ubah" cokelat + menu ⋮; tombol bawah "Tambah Produk Baru".
 class ProductManagementScreen extends ConsumerStatefulWidget {
   const ProductManagementScreen({super.key});
 
@@ -25,144 +29,56 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
     super.dispose();
   }
 
-  void _openProductFormDialog([ProductEntity? existingProduct]) {
-    final nameController = TextEditingController(text: existingProduct?.name ?? '');
-    final priceController = TextEditingController(
-      text: existingProduct != null ? existingProduct.price.toStringAsFixed(0) : '',
+  void _navigateToForm([ProductEntity? existingProduct]) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ProductFormScreen(existingProduct: existingProduct),
+      ),
     );
-    final stockController = TextEditingController(
-      text: existingProduct != null ? existingProduct.currentStock.toString() : '20',
-    );
-    String? selectedCategoryId = existingProduct?.categoryId;
-    bool isAvailable = existingProduct?.isAvailable ?? true;
+  }
 
-    showDialog(
+  void _showOverflowMenu(BuildContext context, ProductEntity product) {
+    showModalBottomSheet(
       context: context,
-      builder: (dialogContext) {
-        return Consumer(
-          builder: (context, ref, child) {
-            final categoriesAsync = ref.watch(categoriesListProvider);
-            final categories = categoriesAsync.value ?? [];
-            if (selectedCategoryId == null && categories.isNotEmpty) {
-              selectedCategoryId = categories.first.id;
-            }
-
-            return StatefulBuilder(
-              builder: (context, setDialogState) {
-                return AlertDialog(
-                  backgroundColor: AppColors.surfaceWhite,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
-                  title: Text(
-                    existingProduct == null ? 'Tambah Produk Bakery' : 'Edit Produk Bakery',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+      backgroundColor: AppColors.surfaceWhite,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (bottomSheetCtx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 36.0,
+                  height: 4.0,
+                  margin: const EdgeInsets.only(bottom: 12.0),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCDCDC),
+                    borderRadius: BorderRadius.circular(2.0),
                   ),
-                  content: SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        TextField(
-                          controller: nameController,
-                          decoration: const InputDecoration(
-                            labelText: 'Nama Produk',
-                            hintText: 'Misal: Chocolate Croissant',
-                          ),
-                        ),
-                        const SizedBox(height: 12.0),
-                        DropdownButtonFormField<String>(
-                          initialValue: selectedCategoryId,
-                          decoration: const InputDecoration(labelText: 'Kategori'),
-                          items: categories.map((cat) {
-                            return DropdownMenuItem(
-                              value: cat.id,
-                              child: Text(cat.name),
-                            );
-                          }).toList(),
-                          onChanged: (val) {
-                            setDialogState(() => selectedCategoryId = val);
-                          },
-                        ),
-                        const SizedBox(height: 12.0),
-                        TextField(
-                          controller: priceController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Harga Jual (Rp)',
-                            hintText: 'Misal: 25000',
-                          ),
-                        ),
-                        const SizedBox(height: 12.0),
-                        TextField(
-                          controller: stockController,
-                          keyboardType: TextInputType.number,
-                          decoration: const InputDecoration(
-                            labelText: 'Jumlah Stok',
-                            hintText: 'Misal: 15',
-                          ),
-                        ),
-                        const SizedBox(height: 12.0),
-                        SwitchListTile.adaptive(
-                          title: const Text('Status Tersedia', style: TextStyle(fontSize: 13.0)),
-                          value: isAvailable,
-                          activeThumbColor: AppColors.success,
-                          contentPadding: EdgeInsets.zero,
-                          onChanged: (val) {
-                            setDialogState(() => isAvailable = val);
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(),
-                      child: const Text('Batal', style: TextStyle(color: AppColors.textSecondary)),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: AppColors.textOnDark,
-                      ),
-                      onPressed: () async {
-                        final name = nameController.text.trim();
-                        final price = double.tryParse(priceController.text.trim()) ?? 0.0;
-                        final stock = int.tryParse(stockController.text.trim()) ?? 0;
-
-                        if (name.isEmpty || price <= 0) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Nama dan harga valid wajib diisi!')),
-                          );
-                          return;
-                        }
-
-                        final now = DateTime.now();
-                        final product = ProductEntity(
-                          id: existingProduct?.id ?? 'prod-${now.millisecondsSinceEpoch}',
-                          storeId: 'store-main-001',
-                          name: name,
-                          price: price,
-                          categoryId: selectedCategoryId,
-                          sku: existingProduct?.sku ?? 'NGB-${now.millisecondsSinceEpoch.toString().substring(8)}',
-                          currentStock: stock,
-                          isAvailable: isAvailable,
-                          createdAt: existingProduct?.createdAt ?? now,
-                          updatedAt: now,
-                        );
-
-                        final repo = ref.read(productRepositoryProvider);
-                        await repo.saveProduct(product);
-                        ref.invalidate(productsListProvider);
-
-                        if (dialogContext.mounted) {
-                          Navigator.of(dialogContext).pop();
-                        }
-                      },
-                      child: const Text('Simpan'),
-                    ),
-                  ],
-                );
-              },
-            );
-          },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.edit_outlined, color: AppColors.primary),
+                  title: const Text('Ubah Produk', style: TextStyle(fontWeight: FontWeight.bold)),
+                  onTap: () {
+                    Navigator.of(bottomSheetCtx).pop();
+                    _navigateToForm(product);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: AppColors.danger),
+                  title: const Text('Hapus Produk', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.danger)),
+                  onTap: () {
+                    Navigator.of(bottomSheetCtx).pop();
+                    _confirmDelete(product);
+                  },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -208,132 +124,206 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
     final productsAsync = ref.watch(productsListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.cream,
       appBar: AppBar(
-        title: const Text('Kelola Master Produk'),
+        title: const Text('Daftar Produk'),
         backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnDark,
-        actions: [
-          IconButton(
-            onPressed: () => _openProductFormDialog(),
-            icon: const Icon(Icons.add),
-            tooltip: 'Tambah Produk',
-          ),
-        ],
+        foregroundColor: AppColors.surfaceWhite,
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18.0),
+          onPressed: () {
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            } else {
+              context.go('/pos');
+            }
+          },
+        ),
       ),
-      body: Column(
-        children: [
-          // Filter Search Bar
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (val) {
-                setState(() => _searchFilter = val.toLowerCase());
-              },
-              decoration: InputDecoration(
-                hintText: 'Cari dalam daftar produk...',
-                prefixIcon: const Icon(Icons.search, color: AppColors.primary),
-                fillColor: AppColors.surfaceWhite,
-                filled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                  borderSide: const BorderSide(color: Color(0xFFE2DDD7)),
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Search Bar
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: TextField(
+                controller: _searchController,
+                onChanged: (val) {
+                  setState(() => _searchFilter = val.toLowerCase());
+                },
+                decoration: InputDecoration(
+                  hintText: 'Cari produk bakery...',
+                  prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                  filled: true,
+                  fillColor: AppColors.surfaceWhite,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
               ),
             ),
-          ),
 
-          // Daftar Produk List
-          Expanded(
-            child: productsAsync.when(
-              data: (products) {
-                final filtered = products.where((p) {
-                  return p.name.toLowerCase().contains(_searchFilter);
-                }).toList();
+            // Product List
+            Expanded(
+              child: productsAsync.when(
+                data: (products) {
+                  final filtered = products.where((p) {
+                    return p.name.toLowerCase().contains(_searchFilter);
+                  }).toList();
 
-                if (filtered.isEmpty) {
-                  return const Center(
-                    child: Text('Tidak ada produk yang cocok.'),
-                  );
-                }
+                  if (filtered.isEmpty) {
+                    return const Center(
+                      child: Text('Tidak ada produk yang cocok.', style: TextStyle(color: AppColors.textSecondary)),
+                    );
+                  }
 
-                return ListView.separated(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  itemCount: filtered.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 8.0),
-                  itemBuilder: (context, index) {
-                    final item = filtered[index];
-                    return Container(
-                      padding: const EdgeInsets.all(12.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceWhite,
-                        borderRadius: BorderRadius.circular(12.0),
-                        border: Border.all(color: const Color(0xFFE2DDD7)),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 44.0,
-                            height: 44.0,
-                            decoration: BoxDecoration(
-                              color: AppColors.background,
-                              borderRadius: BorderRadius.circular(8.0),
+                  return ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 16.0),
+                    itemCount: filtered.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 10.0),
+                    itemBuilder: (context, index) {
+                      final item = filtered[index];
+                      final costPriceFormatted = CurrencyFormatter.format(item.costPrice);
+                      final sellPriceFormatted = CurrencyFormatter.format(item.price);
+
+                      return Container(
+                        padding: const EdgeInsets.all(14.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceWhite,
+                          borderRadius: BorderRadius.circular(16.0),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x0A000000),
+                              blurRadius: 4.0,
+                              offset: Offset(0, 2),
                             ),
-                            child: const Icon(Icons.bakery_dining, color: AppColors.primary),
-                          ),
-                          const SizedBox(width: 12.0),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            // Foto Kiri
+                            Container(
+                              width: 52.0,
+                              height: 52.0,
+                              decoration: BoxDecoration(
+                                color: AppColors.cream,
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: const Icon(Icons.bakery_dining, color: AppColors.primary, size: 28.0),
+                            ),
+                            const SizedBox(width: 12.0),
+
+                            // Info Nama & "Beli Rp14.000 / Jual Rp28.000 / Stok: 99"
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.name,
+                                    style: const TextStyle(
+                                      fontSize: 14.5,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.noir,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4.0),
+                                  Text(
+                                    'Beli $costPriceFormatted / Jual $sellPriceFormatted / Stok: ${item.currentStock}',
+                                    maxLines: 2,
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      color: AppColors.textSecondary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Tombol "Ubah" Cokelat + Menu ⋮
+                            Row(
                               children: [
-                                Text(
-                                  item.name,
-                                  style: const TextStyle(
-                                    fontSize: 14.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.noir,
+                                ElevatedButton(
+                                  onPressed: () => _navigateToForm(item),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: AppColors.surfaceWhite,
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(9999),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Ubah',
+                                    style: TextStyle(
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 2.0),
-                                Text(
-                                  '${CurrencyFormatter.format(item.price)} • Stok: ${item.currentStock}',
-                                  style: const TextStyle(
-                                    fontSize: 12.0,
-                                    color: AppColors.textSecondary,
-                                  ),
+                                IconButton(
+                                  icon: const Icon(Icons.more_vert, size: 20.0, color: AppColors.primary),
+                                  onPressed: () => _showOverflowMenu(context, item),
                                 ),
                               ],
                             ),
-                          ),
-                          IconButton(
-                            onPressed: () => _openProductFormDialog(item),
-                            icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20.0),
-                            tooltip: 'Edit Produk',
-                          ),
-                          IconButton(
-                            onPressed: () => _confirmDelete(item),
-                            icon: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20.0),
-                            tooltip: 'Hapus Produk',
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-              error: (err, _) => Center(child: Text('Error: $err')),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                error: (err, _) => Center(child: Text('Error: $err')),
+              ),
             ),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openProductFormDialog(),
-        backgroundColor: AppColors.accent,
-        foregroundColor: AppColors.primary,
-        tooltip: 'Tambah Produk Baru',
-        child: const Icon(Icons.add, size: 28.0),
+
+            // Tombol Sticky Bawah: "Tambah Produk Baru"
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: const BoxDecoration(
+                color: AppColors.surfaceWhite,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x14000000),
+                    blurRadius: 8.0,
+                    offset: Offset(0, -2),
+                  ),
+                ],
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50.0,
+                child: ElevatedButton.icon(
+                  onPressed: () => _navigateToForm(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.surfaceWhite,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9999),
+                    ),
+                  ),
+                  icon: const Icon(Icons.add, size: 20.0),
+                  label: const Text(
+                    'Tambah Produk Baru',
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.surfaceWhite,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

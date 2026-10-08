@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void _startTimer() {
     _timer = Timer(const Duration(milliseconds: 1800), () {
       if (mounted) {
-        context.go('/pos');
+        context.go('/login');
       }
     });
   }
@@ -39,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _skipSplash() {
     _timer?.cancel();
-    context.go('/pos');
+    context.go('/login');
   }
 
   @override

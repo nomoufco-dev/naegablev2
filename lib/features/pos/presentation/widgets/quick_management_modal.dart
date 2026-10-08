@@ -109,7 +109,7 @@ class QuickManagementModal extends ConsumerWidget {
                   subtitle: 'Detail & Edit Menu',
                   onTap: () {
                     Navigator.of(context).pop();
-                    onNavigateToProductCrud();
+                    Navigator.of(context).pushNamed('/product-detail');
                   },
                 ),
                 const SizedBox(height: 10.0),
@@ -132,7 +132,8 @@ class QuickManagementModal extends ConsumerWidget {
                   title: 'Pengiriman',
                   subtitle: 'Layanan Pengiriman',
                   onTap: () {
-                    ref.read(deliverySettingsControllerProvider.notifier).toggleDelivery();
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushNamed('/delivery-settings');
                   },
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
