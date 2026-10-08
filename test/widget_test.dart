@@ -1,30 +1,28 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:pos_naegable/main.dart';
+import 'package:pos_naegable/app/app.dart';
+import 'package:pos_naegable/core/utils/currency_formatter.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group('POS Naegable Foundation Tests', () {
+    test('CurrencyFormatter formats IDR correctly', () {
+      expect(CurrencyFormatter.format(25000), 'Rp 25.000');
+      expect(CurrencyFormatter.format(1500000), 'Rp 1.500.000');
+      expect(CurrencyFormatter.format(0), 'Rp 0');
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    testWidgets('PosNaegableApp initializes and displays brand mark on splash', (
+      WidgetTester tester,
+    ) async {
+      await tester.pumpWidget(
+        const ProviderScope(
+          child: PosNaegableApp(),
+        ),
+      );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+      // Verifikasi komponen teks brand pada Splash screen
+      expect(find.text('naegablé'), findsOneWidget);
+      expect(find.text('BAKEHAUS'), findsOneWidget);
+    });
   });
 }
