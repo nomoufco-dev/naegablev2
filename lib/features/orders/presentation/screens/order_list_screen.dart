@@ -228,6 +228,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
         ),
         actions: [
           IconButton(
+            key: const Key('trash_button'),
             icon: const Icon(Icons.delete_outline, color: AppColors.surfaceWhite),
             tooltip: 'Riwayat Pesanan Terhapus',
             onPressed: () => context.push('/deleted-orders'),

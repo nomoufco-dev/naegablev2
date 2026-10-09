@@ -10,8 +10,9 @@ import '../../../../core/utils/date_formatter.dart';
 enum DeletedHistoryMode { orders, transactions }
 
 /// Layar Riwayat Pesanan Terhapus & Riwayat Transaksi Terhapus Naegablé Bakehaus
-/// Ditata dengan nuansa visual LoginScreen (Background cokelat AppColors.primary,
-/// kartu putih rounded 28.0, chip blush #F5CBD7 rounded-full).
+/// Ditata sesuai spesifikasi visual Figma (DESIGN_SPEC_FIGMA.md):
+/// Background Cream #FFF7EC (AppColors.cream), Header Cokelat Tua #442F2A (AppColors.primary),
+/// Banner Info Pink Blush #F5CBD7, Kartu Putih #FFFFFF rounded 18.0, Total Hijau #2E9E5B.
 class DeletedHistoryScreen extends ConsumerStatefulWidget {
   const DeletedHistoryScreen({
     super.key,
@@ -47,12 +48,13 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
         : 'Riwayat Transaksi Terhapus';
 
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: AppColors.cream,
       body: SafeArea(
         child: Column(
           children: [
-            // Header Top Bar Cokelat Tua (AppColors.primary)
-            Padding(
+            // Header Top Bar Cokelat Tua (AppColors.primary #442F2A)
+            Container(
+              color: AppColors.primary,
               padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
               child: Stack(
                 alignment: Alignment.center,
@@ -93,7 +95,7 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
             Container(
               width: double.infinity,
               margin:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 6.0),
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
               padding: const EdgeInsets.symmetric(
                   horizontal: 16.0, vertical: 12.0),
               decoration: BoxDecoration(
@@ -101,8 +103,8 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                 borderRadius: BorderRadius.circular(9999),
                 boxShadow: const [
                   BoxShadow(
-                    color: Color(0x1F000000),
-                    blurRadius: 6.0,
+                    color: Color(0x0A000000),
+                    blurRadius: 4.0,
                     offset: Offset(0, 2),
                   ),
                 ],
@@ -125,7 +127,6 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 8.0),
 
             // Konten Daftar Riwayat Terhapus (FutureBuilder)
             Expanded(
@@ -135,13 +136,12 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(
                       child: CircularProgressIndicator(
-                          color: AppColors.surfaceWhite),
+                          color: AppColors.primary),
                     );
                   }
 
                   final orders = snapshot.data ?? [];
-                  // HAPUS logika mock: hanya tampilkan order yang benar-benar status cancelled
-                  // DAN belum kedaluwarsa 3 bulan (pakai updatedAt ?? createdAt)
+                  // Tampilkan order yang cancelled DAN belum kedaluwarsa 3 bulan
                   final deletedItems = orders.where((o) {
                     if (o.orderStatus != 'cancelled') return false;
                     final deleteTime = o.updatedAt ?? o.createdAt;
@@ -159,12 +159,12 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceWhite,
-                          borderRadius: BorderRadius.circular(28.0),
+                          borderRadius: BorderRadius.circular(18.0),
                           boxShadow: const [
                             BoxShadow(
-                              color: Color(0x2B000000),
-                              blurRadius: 16.0,
-                              offset: Offset(0, 6),
+                              color: Color(0x0A000000),
+                              blurRadius: 6.0,
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -185,7 +185,7 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                     padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 32.0),
                     itemCount: deletedItems.length,
                     separatorBuilder: (context, index) =>
-                        const SizedBox(height: 14.0),
+                        const SizedBox(height: 12.0),
                     itemBuilder: (context, index) {
                       final item = deletedItems[index];
                       final isExpanded = _expandedIds.contains(item.id);
@@ -196,16 +196,16 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                       return Container(
                         decoration: BoxDecoration(
                           color: AppColors.surfaceWhite,
-                          borderRadius: BorderRadius.circular(28.0),
+                          borderRadius: BorderRadius.circular(18.0),
                           boxShadow: const [
                             BoxShadow(
-                              color: Color(0x2B000000),
-                              blurRadius: 16.0,
-                              offset: Offset(0, 6),
+                              color: Color(0x0A000000),
+                              blurRadius: 6.0,
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
-                        padding: const EdgeInsets.all(20.0),
+                        padding: const EdgeInsets.all(16.0),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -265,7 +265,7 @@ class _DeletedHistoryScreenState extends ConsumerState<DeletedHistoryScreen> {
                               style: const TextStyle(
                                 fontSize: 16.0,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
+                                color: AppColors.noir,
                               ),
                             ),
                             const SizedBox(height: 2.0),
