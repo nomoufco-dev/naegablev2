@@ -194,7 +194,7 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
       final repo = ref.read(orderRepositoryProvider);
       await repo.updateOrderStatus(order.id, 'cancelled');
       ref.invalidate(ordersListProvider);
-      if (!mounted) return;
+      if (!mounted || !context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Pesanan ${order.orderNumber} berhasil dibatalkan'),

@@ -23,7 +23,6 @@ class TransactionHistoryScreen extends ConsumerStatefulWidget {
 class _TransactionHistoryScreenState
     extends ConsumerState<TransactionHistoryScreen> {
   final TextEditingController _searchController = TextEditingController();
-  int _selectedTab = 0; // 0: Pesanan, 1: Pesanan Dibatalkan
   final Set<String> _expandedOrderIds = {};
 
   @override
@@ -248,15 +247,14 @@ class _TransactionHistoryScreenState
       await repo.updateOrderStatus(order.id, 'cancelled');
       ref.invalidate(ordersListProvider);
       ref.invalidate(productsListProvider);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Pesanan ${order.orderNumber} berhasil dibatalkan'),
-            backgroundColor: AppColors.primary,
-            duration: const Duration(seconds: 2),
-          ),
-        );
-      }
+      if (!mounted || !context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Pesanan ${order.orderNumber} berhasil dibatalkan'),
+          backgroundColor: AppColors.primary,
+          duration: const Duration(seconds: 2),
+        ),
+      );
     }
   }
 
@@ -423,51 +421,18 @@ class _TransactionHistoryScreenState
             ),
           ),
 
-          // 2. Segmented Control / Tab Bar (Pesanan vs Pesanan Dibatalkan)
-          Container(
-            color: AppColors.surfaceWhite,
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: _buildTabButton(
-                    index: 0,
-                    title: 'Pesanan',
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                Expanded(
-                  child: _buildTabButton(
-                    index: 1,
-                    title: 'Pesanan Dibatalkan',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Divider(
-            height: 1.0,
-            thickness: 1.0,
-            color: Color(0xFFEAE5E0),
-          ),
-
-          // 3. Konten Daftar Pesanan (Card Layout Sesuai Desain)
+          // 2. Konten Daftar Pesanan (Pesanan Aktif)
           Expanded(
             child: ordersAsync.when(
               data: (orders) {
-                // Filter berdasarkan tab (Pesanan Aktif vs Pesanan Dibatalkan)
-                final tabFilteredOrders = orders.where((order) {
-                  if (_selectedTab == 0) {
-                    return order.orderStatus != 'cancelled';
-                  } else {
-                    return order.orderStatus == 'cancelled';
-                  }
-                }).toList();
+                // Hapus tab "Pesanan Dibatalkan" — tab "Pesanan" hanya menampilkan order yang TIDAK cancelled
+                final activeOrders = orders
+                    .where((order) => order.orderStatus != 'cancelled')
+                    .toList();
 
                 // Filter pencarian teks
                 final query = _searchController.text.trim().toLowerCase();
-                final filteredOrders = tabFilteredOrders.where((order) {
+                final filteredOrders = activeOrders.where((order) {
                   if (query.isEmpty) return true;
                   final matchNumber =
                       order.orderNumber.toLowerCase().contains(query);
@@ -486,22 +451,16 @@ class _TransactionHistoryScreenState
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(
-                            _selectedTab == 0
-                                ? Icons.receipt_long_outlined
-                                : Icons.cancel_presentation_outlined,
+                            Icons.receipt_long_outlined,
                             size: 60.0,
                             color: AppColors.textSecondary
                                 .withValues(alpha: 0.35),
                           ),
                           const SizedBox(height: 12.0),
                           Text(
-                            _selectedTab == 0
-                                ? (_searchController.text.isNotEmpty
-                                    ? 'Tidak ada pesanan cocok dengan pencarian.'
-                                    : 'Belum ada pesanan aktif.')
-                                : (_searchController.text.isNotEmpty
-                                    ? 'Tidak ada pesanan dibatalkan yang cocok.'
-                                    : 'Tidak ada pesanan yang dibatalkan.'),
+                            _searchController.text.isNotEmpty
+                                ? 'Tidak ada pesanan cocok dengan pencarian.'
+                                : 'Belum ada pesanan aktif.',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 13.5,
@@ -537,42 +496,6 @@ class _TransactionHistoryScreenState
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTabButton({required int index, required String title}) {
-    final isSelected = _selectedTab == index;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedTab = index;
-        });
-      },
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        height: 38.0,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceWhite,
-          borderRadius: BorderRadius.circular(9999),
-          border: isSelected
-              ? null
-              : Border.all(
-                  color: const Color(0xFFE2DDD7),
-                  width: 1.0,
-                ),
-        ),
-        child: Text(
-          title,
-          style: TextStyle(
-            fontSize: 13.0,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? AppColors.surfaceWhite : AppColors.primary,
-          ),
-        ),
       ),
     );
   }

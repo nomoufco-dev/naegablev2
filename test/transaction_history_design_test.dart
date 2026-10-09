@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:pos_naegable/core/constants/app_colors.dart';
 import 'package:pos_naegable/core/di/providers.dart';
 import 'package:pos_naegable/core/domain/entities/order_entity.dart';
 import 'package:pos_naegable/core/domain/repositories/order_repository.dart';
@@ -93,7 +92,7 @@ void main() {
   );
 
   testWidgets(
-      'TransactionHistoryScreen visual mirror matches daftar pesanan design',
+      'TransactionHistoryScreen visual mirror matches daftar pesanan design and hides cancelled orders',
       (WidgetTester tester) async {
     final repo = InMemoryOrderRepo([sampleOrder1, sampleOrder2]);
 
@@ -116,11 +115,10 @@ void main() {
     expect(find.byIcon(Icons.search), findsOneWidget);
     expect(find.byIcon(Icons.assignment_return_outlined), findsOneWidget);
 
-    // 2. Segmented control tabs
-    expect(find.text('Pesanan'), findsOneWidget);
-    expect(find.text('Pesanan Dibatalkan'), findsOneWidget);
+    // 2. Tab "Pesanan Dibatalkan" telah dihapus
+    expect(find.text('Pesanan Dibatalkan'), findsNothing);
 
-    // 3. Active tab displays sampleOrder1 (Gaby) and not sampleOrder2 (Budi)
+    // 3. Hanya menampilkan pesanan aktif (Gaby) dan TIDAK menampilkan pesanan dibatalkan (Budi)
     expect(find.text('Gaby'), findsOneWidget);
     expect(find.text('TRX20261002-001'), findsOneWidget);
     expect(find.text('Pesanan Baru'), findsOneWidget);
@@ -136,15 +134,5 @@ void main() {
     expect(find.text('Dubai Chewy Cookie x2'), findsOneWidget);
     expect(find.text('Lihat Struk'), findsOneWidget);
     expect(find.text('Batalkan'), findsOneWidget);
-
-    // 5. Switch to 'Pesanan Dibatalkan' tab
-    await tester.tap(find.text('Pesanan Dibatalkan'));
-    await tester.pumpAndSettle();
-
-    // Cancelled tab displays Budi with badge 'Pesanan Dibatalkan'
-    expect(find.text('Budi'), findsOneWidget);
-    expect(find.text('TRX20261002-002'), findsOneWidget);
-    expect(find.text('Pesanan Dibatalkan'), findsNWidgets(2)); // Tab + Badge
-    expect(find.text('Gaby'), findsNothing);
   });
 }

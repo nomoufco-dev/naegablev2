@@ -11,6 +11,33 @@ abstract final class DateFormatter {
     'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
   ];
 
+  /// Memeriksa apakah tanggal berada dalam rentang 3 bulan terakhir dari [now].
+  static bool isWithin3Months(DateTime date, {DateTime? now}) {
+    final reference = now ?? DateTime.now();
+    int year = reference.year;
+    int month = reference.month - 3;
+    if (month <= 0) {
+      month += 12;
+      year -= 1;
+    }
+    int day = reference.day;
+    int maxDays = DateTime(year, month + 1, 0).day;
+    if (day > maxDays) {
+      day = maxDays;
+    }
+    final cutoff = DateTime(
+      year,
+      month,
+      day,
+      reference.hour,
+      reference.minute,
+      reference.second,
+      reference.millisecond,
+      reference.microsecond,
+    );
+    return !date.isBefore(cutoff);
+  }
+
   /// Format sesuai desain daftar pesanan: "02 Okt 2026 11:00"
   static String formatOrderDateTime(DateTime dt) {
     final d = dt.day.toString().padLeft(2, '0');
