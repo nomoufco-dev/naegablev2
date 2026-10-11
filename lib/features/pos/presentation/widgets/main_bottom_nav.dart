@@ -68,10 +68,15 @@ class MainBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return CustomBottomNavBar(
-      selectedIndex: selectedIndex,
-      onItemSelected: (index) => _onItemSelected(context, index),
-      onFabPressed: () => _showQuickManagement(context),
+    // Padding bawah mengikuti inset sistem (gesture bar / nav bar) agar
+    // pill tidak tertutup bar sistem pada mode edge-to-edge.
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+      child: CustomBottomNavBar(
+        selectedIndex: selectedIndex,
+        onItemSelected: (index) => _onItemSelected(context, index),
+        onFabPressed: () => _showQuickManagement(context),
+      ),
     );
   }
 }

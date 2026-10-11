@@ -319,6 +319,8 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
               data: (orders) {
                 final query = _searchController.text.trim().toLowerCase();
                 final filtered = orders.where((o) {
+                  // Pesanan yang dibatalkan pindah ke sampah, jangan tampil di daftar
+                  if (o.orderStatus == 'cancelled') return false;
                   if (query.isEmpty) return true;
                   final matchNum = o.orderNumber.toLowerCase().contains(query);
                   final matchName = (o.customerName ?? '')

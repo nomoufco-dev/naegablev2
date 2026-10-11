@@ -186,7 +186,12 @@ class _PosScreenState extends ConsumerState<PosScreen> with SingleTickerProvider
           bottomNavigationBar: AnimatedBuilder(
             animation: _notchMorphAnimation,
             builder: (context, _) {
-              return CustomBottomNavBar(
+              // Padding bawah mengikuti inset sistem agar pill tidak tertutup
+              // bar sistem pada mode edge-to-edge.
+              return Padding(
+                padding:
+                    EdgeInsets.only(bottom: MediaQuery.of(context).padding.bottom),
+                child: CustomBottomNavBar(
                 selectedIndex: _currentTabIndex,
                 morphProgress: _notchMorphAnimation.value,
                 isCloseState: _notchMorphAnimation.value > 0.5,
@@ -216,6 +221,7 @@ class _PosScreenState extends ConsumerState<PosScreen> with SingleTickerProvider
                     _openQuickManagementSheet();
                   }
                 },
+                ),
               );
             },
           ),
@@ -247,7 +253,7 @@ class _PosScreenState extends ConsumerState<PosScreen> with SingleTickerProvider
           Positioned(
             left: 16.0,
             right: 16.0,
-            bottom: 58.0, // Diturunkan sedikit ke bawah agar pas menempel rapat dengan lekukan navbar
+            bottom: 58.0 + MediaQuery.of(context).padding.bottom, // Diturunkan sedikit ke bawah agar pas menempel rapat dengan lekukan navbar (+ inset sistem)
             child: RepaintBoundary(
               child: AnimatedBuilder(
                 animation: _morphController,
