@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/di/providers.dart';
 import '../../../../core/domain/entities/order_entity.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
+
 import 'package:pos_naegable/features/pos/presentation/controllers/pos_controller.dart';
+
+import '../../../pos/presentation/widgets/main_bottom_nav.dart';
 
 /// Layar Daftar Pesanan & Riwayat Transaksi POS Naegablé Bakehaus.
 /// Mencerminkan secara visual desain resmi pada `screens/daftar pesanan - history pesanan.png`.
@@ -58,8 +62,10 @@ class _TransactionHistoryScreenState
                 style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 2.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 2.0,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(10.0),
@@ -142,8 +148,10 @@ class _TransactionHistoryScreenState
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Pajak PB1 (10%)',
-                        style: TextStyle(fontSize: 12.0)),
+                    const Text(
+                      'Pajak PB1 (10%)',
+                      style: TextStyle(fontSize: 12.0),
+                    ),
                     Text(
                       CurrencyFormatter.format(order.taxAmount),
                       style: const TextStyle(fontSize: 12.0),
@@ -154,8 +162,10 @@ class _TransactionHistoryScreenState
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Ongkir Delivery',
-                          style: TextStyle(fontSize: 12.0)),
+                      const Text(
+                        'Ongkir Delivery',
+                        style: TextStyle(fontSize: 12.0),
+                      ),
                       Text(
                         CurrencyFormatter.format(order.deliveryFee),
                         style: const TextStyle(fontSize: 12.0),
@@ -169,7 +179,9 @@ class _TransactionHistoryScreenState
                     const Text(
                       'TOTAL',
                       style: TextStyle(
-                          fontSize: 14.0, fontWeight: FontWeight.bold),
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     Text(
                       CurrencyFormatter.format(order.totalAmount),
@@ -196,7 +208,9 @@ class _TransactionHistoryScreenState
   }
 
   Future<void> _confirmCancelOrder(
-      BuildContext context, OrderEntity order) async {
+    BuildContext context,
+    OrderEntity order,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
@@ -297,8 +311,11 @@ class _TransactionHistoryScreenState
                         Align(
                           alignment: Alignment.centerLeft,
                           child: IconButton(
-                            icon: const Icon(Icons.arrow_back_ios_new,
-                                color: AppColors.surfaceWhite, size: 20.0),
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new,
+                              color: AppColors.surfaceWhite,
+                              size: 20.0,
+                            ),
                             onPressed: () {
                               if (Navigator.of(context).canPop()) {
                                 Navigator.of(context).pop();
@@ -367,9 +384,11 @@ class _TransactionHistoryScreenState
                                 border: InputBorder.none,
                                 suffixIcon: _searchController.text.isNotEmpty
                                     ? IconButton(
-                                        icon: const Icon(Icons.clear,
-                                            size: 18.0,
-                                            color: AppColors.textSecondary),
+                                        icon: const Icon(
+                                          Icons.clear,
+                                          size: 18.0,
+                                          color: AppColors.textSecondary,
+                                        ),
                                         onPressed: () {
                                           _searchController.clear();
                                           setState(() {});
@@ -399,8 +418,9 @@ class _TransactionHistoryScreenState
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: AppColors.surfaceWhite
-                                    .withValues(alpha: 0.3),
+                                color: AppColors.surfaceWhite.withValues(
+                                  alpha: 0.3,
+                                ),
                                 width: 1.2,
                               ),
                             ),
@@ -434,12 +454,15 @@ class _TransactionHistoryScreenState
                 final query = _searchController.text.trim().toLowerCase();
                 final filteredOrders = activeOrders.where((order) {
                   if (query.isEmpty) return true;
-                  final matchNumber =
-                      order.orderNumber.toLowerCase().contains(query);
-                  final matchCustomer = order.customerName != null &&
+                  final matchNumber = order.orderNumber.toLowerCase().contains(
+                    query,
+                  );
+                  final matchCustomer =
+                      order.customerName != null &&
                       order.customerName!.toLowerCase().contains(query);
-                  final matchItem = order.items.any((item) =>
-                      item.productName.toLowerCase().contains(query));
+                  final matchItem = order.items.any(
+                    (item) => item.productName.toLowerCase().contains(query),
+                  );
                   return matchNumber || matchCustomer || matchItem;
                 }).toList();
 
@@ -453,8 +476,9 @@ class _TransactionHistoryScreenState
                           Icon(
                             Icons.receipt_long_outlined,
                             size: 60.0,
-                            color: AppColors.textSecondary
-                                .withValues(alpha: 0.35),
+                            color: AppColors.textSecondary.withValues(
+                              alpha: 0.35,
+                            ),
                           ),
                           const SizedBox(height: 12.0),
                           Text(
@@ -497,14 +521,16 @@ class _TransactionHistoryScreenState
           ),
         ],
       ),
+
+      bottomNavigationBar: const MainBottomNav(selectedIndex: 2),
     );
   }
 
   Widget _buildOrderCard(OrderEntity order, int index) {
     final isExpanded = _expandedOrderIds.contains(order.id);
     final isCancelled = order.orderStatus == 'cancelled';
-    final customerName = (order.customerName != null &&
-            order.customerName!.trim().isNotEmpty)
+    final customerName =
+        (order.customerName != null && order.customerName!.trim().isNotEmpty)
         ? order.customerName!
         : 'Gaby';
 
@@ -517,10 +543,7 @@ class _TransactionHistoryScreenState
       decoration: BoxDecoration(
         color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(
-          color: const Color(0xFFE2DDD7),
-          width: 1.0,
-        ),
+        border: Border.all(color: const Color(0xFFE2DDD7), width: 1.0),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.03),
@@ -602,10 +625,14 @@ class _TransactionHistoryScreenState
                     const SizedBox(width: 6.0),
                     GestureDetector(
                       onTap: () {
-                        Clipboard.setData(ClipboardData(text: order.orderNumber));
+                        Clipboard.setData(
+                          ClipboardData(text: order.orderNumber),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('Nomor TRX disalin: ${order.orderNumber}'),
+                            content: Text(
+                              'Nomor TRX disalin: ${order.orderNumber}',
+                            ),
                             duration: const Duration(seconds: 1),
                           ),
                         );
@@ -655,7 +682,8 @@ class _TransactionHistoryScreenState
                             ),
                             TextSpan(
                               text: DateFormatter.formatOrderDateTime(
-                                  pickupDateTime),
+                                pickupDateTime,
+                              ),
                               style: const TextStyle(
                                 fontSize: 11.5,
                                 fontWeight: FontWeight.bold,
@@ -840,8 +868,9 @@ class _TransactionHistoryScreenState
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 8.0,
+                              ),
                             ),
                             onPressed: () =>
                                 _confirmCancelOrder(context, order),

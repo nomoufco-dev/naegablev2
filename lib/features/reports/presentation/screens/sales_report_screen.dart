@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/di/providers.dart';
 import '../../../../core/utils/currency_formatter.dart';
+
 import 'package:pos_naegable/features/pos/presentation/controllers/pos_controller.dart';
+
+import '../../../pos/presentation/widgets/main_bottom_nav.dart';
 
 final salesSummaryProvider = FutureProvider<Map<String, dynamic>>((ref) async {
   // Watch ordersListProvider so report refreshes automatically when orders change
@@ -43,10 +47,13 @@ class SalesReportScreen extends ConsumerWidget {
       body: summaryAsync.when(
         data: (summary) {
           final totalOrders = summary['total_orders'] as int? ?? 0;
-          final totalRevenue = (summary['total_revenue'] as num?)?.toDouble() ?? 0.0;
+          final totalRevenue =
+              (summary['total_revenue'] as num?)?.toDouble() ?? 0.0;
           final totalItemsSold = summary['total_items_sold'] as int? ?? 0;
-          final averageOrder = (summary['average_order_value'] as num?)?.toDouble() ?? 0.0;
-          final productSales = (summary['product_sales'] as Map<String, dynamic>?) ?? {};
+          final averageOrder =
+              (summary['average_order_value'] as num?)?.toDouble() ?? 0.0;
+          final productSales =
+              (summary['product_sales'] as Map<String, dynamic>?) ?? {};
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.md),
@@ -159,7 +166,10 @@ class SalesReportScreen extends ConsumerWidget {
                     ),
                     child: Column(
                       children: productSales.entries.map((entry) {
-                        final maxVal = productSales.values.fold<int>(1, (max, v) => v > max ? v : max);
+                        final maxVal = productSales.values.fold<int>(
+                          1,
+                          (max, v) => v > max ? v : max,
+                        );
                         final ratio = (entry.value as int) / maxVal;
 
                         return Padding(
@@ -168,7 +178,8 @@ class SalesReportScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     entry.key,
@@ -208,9 +219,13 @@ class SalesReportScreen extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
         error: (err, _) => Center(child: Text('Error: $err')),
       ),
+
+      bottomNavigationBar: const MainBottomNav(selectedIndex: 3),
     );
   }
 
@@ -233,7 +248,10 @@ class SalesReportScreen extends ConsumerWidget {
           const SizedBox(height: 8.0),
           Text(
             title,
-            style: const TextStyle(fontSize: 11.0, color: AppColors.textSecondary),
+            style: const TextStyle(
+              fontSize: 11.0,
+              color: AppColors.textSecondary,
+            ),
           ),
           const SizedBox(height: 2.0),
           Text(

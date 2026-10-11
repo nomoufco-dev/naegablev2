@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
 import '../../../../core/di/providers.dart';
@@ -9,6 +10,7 @@ import '../../../../core/domain/entities/order_entity.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/utils/date_formatter.dart';
 import '../../../pos/presentation/controllers/pos_controller.dart';
+import '../../../pos/presentation/widgets/main_bottom_nav.dart';
 
 /// Layar Daftar Pesanan Naegablé Bakehaus sesuai spesifikasi Figma (DESIGN_SPEC_FIGMA.md):
 /// Header + search + ikon trash, kartu expandable (chip pink "Pesanan Baru",
@@ -75,10 +77,16 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                   ),
                 ),
                 ListTile(
-                  leading: const Icon(Icons.receipt_outlined, color: AppColors.primary),
+                  leading: const Icon(
+                    Icons.receipt_outlined,
+                    color: AppColors.primary,
+                  ),
                   title: const Text(
                     'Struk Pesanan',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14.0,
+                    ),
                   ),
                   onTap: () {
                     Navigator.of(bottomSheetCtx).pop();
@@ -86,7 +94,10 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.cancel_outlined, color: AppColors.danger),
+                  leading: const Icon(
+                    Icons.cancel_outlined,
+                    color: AppColors.danger,
+                  ),
                   title: const Text(
                     'Batalkan Pesanan',
                     style: TextStyle(
@@ -114,7 +125,9 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surfaceWhite,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+          ),
           title: Text(
             'Struk ${order.orderNumber}',
             style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
@@ -124,28 +137,57 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Pelanggan: ${order.customerName ?? 'Gaby'}', style: const TextStyle(fontSize: 13.0)),
-                Text('Tanggal: ${DateFormatter.formatOrderDateTime(order.createdAt ?? DateTime.now())}',
-                    style: const TextStyle(fontSize: 12.0, color: AppColors.textSecondary)),
+                Text(
+                  'Pelanggan: ${order.customerName ?? 'Gaby'}',
+                  style: const TextStyle(fontSize: 13.0),
+                ),
+                Text(
+                  'Tanggal: ${DateFormatter.formatOrderDateTime(order.createdAt ?? DateTime.now())}',
+                  style: const TextStyle(
+                    fontSize: 12.0,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 const Divider(height: 16.0),
-                ...order.items.map((item) => Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 2.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('${item.productName} x${item.quantity}', style: const TextStyle(fontSize: 12.5)),
-                          Text(CurrencyFormatter.format(item.subtotal), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                    )),
+                ...order.items.map(
+                  (item) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${item.productName} x${item.quantity}',
+                          style: const TextStyle(fontSize: 12.5),
+                        ),
+                        Text(
+                          CurrencyFormatter.format(item.subtotal),
+                          style: const TextStyle(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 const Divider(height: 16.0),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Total', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0)),
+                    const Text(
+                      'Total',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                      ),
+                    ),
                     Text(
                       CurrencyFormatter.format(order.totalAmount),
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0, color: Color(0xFF2E9E5B)),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.0,
+                        color: Color(0xFF2E9E5B),
+                      ),
                     ),
                   ],
                 ),
@@ -163,14 +205,22 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
     );
   }
 
-  Future<void> _confirmCancelOrder(BuildContext context, OrderEntity order) async {
+  Future<void> _confirmCancelOrder(
+    BuildContext context,
+    OrderEntity order,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           backgroundColor: AppColors.surfaceWhite,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.0)),
-          title: const Text('Batalkan Pesanan?', style: TextStyle(fontWeight: FontWeight.bold)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          title: const Text(
+            'Batalkan Pesanan?',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
           content: Text('Batalkan pesanan ${order.orderNumber}?'),
           actions: [
             TextButton(
@@ -196,11 +246,11 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
       ref.invalidate(ordersListProvider);
       if (!mounted || !context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Pesanan ${order.orderNumber} berhasil dibatalkan'),
-            backgroundColor: AppColors.primary,
-          ),
-        );
+        SnackBar(
+          content: Text('Pesanan ${order.orderNumber} berhasil dibatalkan'),
+          backgroundColor: AppColors.primary,
+        ),
+      );
     }
   }
 
@@ -229,7 +279,10 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
         actions: [
           IconButton(
             key: const Key('trash_button'),
-            icon: const Icon(Icons.delete_outline, color: AppColors.surfaceWhite),
+            icon: const Icon(
+              Icons.delete_outline,
+              color: AppColors.surfaceWhite,
+            ),
             tooltip: 'Riwayat Pesanan Terhapus',
             onPressed: () => context.push('/deleted-orders'),
           ),
@@ -248,7 +301,10 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                 prefixIcon: const Icon(Icons.search, color: AppColors.primary),
                 filled: true,
                 fillColor: AppColors.surfaceWhite,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16.0,
+                  vertical: 10.0,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(9999),
                   borderSide: BorderSide.none,
@@ -265,7 +321,9 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                 final filtered = orders.where((o) {
                   if (query.isEmpty) return true;
                   final matchNum = o.orderNumber.toLowerCase().contains(query);
-                  final matchName = (o.customerName ?? '').toLowerCase().contains(query);
+                  final matchName = (o.customerName ?? '')
+                      .toLowerCase()
+                      .contains(query);
                   return matchNum || matchName;
                 }).toList();
 
@@ -278,25 +336,31 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                 return ListView.separated(
                   padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 32.0),
                   itemCount: filtered.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12.0),
+                  separatorBuilder: (context, index) =>
+                      const SizedBox(height: 12.0),
                   itemBuilder: (context, index) {
                     final order = filtered[index];
                     return _buildExpandableOrderCard(order, index);
                   },
                 );
               },
-              loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary),
+              ),
               error: (err, _) => Center(child: Text('Error: $err')),
             ),
           ),
         ],
       ),
+
+      bottomNavigationBar: const MainBottomNav(selectedIndex: 1),
     );
   }
 
   Widget _buildExpandableOrderCard(OrderEntity order, int index) {
     final isExpanded = _expandedOrderIds.contains(order.id);
-    final customerName = (order.customerName != null && order.customerName!.trim().isNotEmpty)
+    final customerName =
+        (order.customerName != null && order.customerName!.trim().isNotEmpty)
         ? order.customerName!
         : 'Gaby';
     final queueNumber = (index + 1).toString().padLeft(2, '0');
@@ -328,7 +392,10 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10.0,
+                        vertical: 4.0,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.blush,
                         borderRadius: BorderRadius.circular(9999),
@@ -347,7 +414,9 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                       constraints: const BoxConstraints(),
                       visualDensity: VisualDensity.compact,
                       icon: Icon(
-                        isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        isExpanded
+                            ? Icons.keyboard_arrow_up
+                            : Icons.keyboard_arrow_down,
                         size: 22.0,
                         color: AppColors.primary,
                       ),
@@ -428,16 +497,27 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                 // Rincian Item (Accordion)
                 if (isExpanded) ...[
                   const Divider(height: 20.0, color: Color(0xFFEAE5E0)),
-                  ...order.items.map((item) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 3.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('${item.productName} x${item.quantity}', style: const TextStyle(fontSize: 12.5)),
-                            Text(CurrencyFormatter.format(item.subtotal), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold)),
-                          ],
-                        ),
-                      )),
+                  ...order.items.map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 3.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${item.productName} x${item.quantity}',
+                            style: const TextStyle(fontSize: 12.5),
+                          ),
+                          Text(
+                            CurrencyFormatter.format(item.subtotal),
+                            style: const TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 8.0),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -534,7 +614,10 @@ class _OrderListScreenState extends ConsumerState<OrderListScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.surfaceWhite,
                           borderRadius: BorderRadius.circular(12.0),
-                          border: Border.all(color: const Color(0xFFE5E5E5), width: 1.0),
+                          border: Border.all(
+                            color: const Color(0xFFE5E5E5),
+                            width: 1.0,
+                          ),
                           boxShadow: const [
                             BoxShadow(
                               color: Color(0x0A000000),
