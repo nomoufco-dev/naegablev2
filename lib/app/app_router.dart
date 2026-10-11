@@ -31,7 +31,10 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/pos',
-      builder: (context, state) => const PosScreen(),
+      // Tab utama: pindah tab harus instan tanpa animasi (seperti aplikasi lain)
+      pageBuilder: (context, state) => const NoTransitionPage(
+        child: PosScreen(),
+      ),
     ),
     GoRoute(
       path: '/products',
@@ -78,7 +81,10 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/orders',
-      builder: (context, state) => const OrderListScreen(),
+      // Tab utama: pindah tab harus instan tanpa animasi (seperti aplikasi lain)
+      pageBuilder: (context, state) => const NoTransitionPage(
+        child: OrderListScreen(),
+      ),
     ),
     GoRoute(
       path: '/delivery-settings',
@@ -94,11 +100,17 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/history',
-      builder: (context, state) => const TransactionHistoryScreen(),
+      // Tab utama: pindah tab harus instan tanpa animasi (seperti aplikasi lain)
+      pageBuilder: (context, state) => const NoTransitionPage(
+        child: TransactionHistoryScreen(),
+      ),
     ),
     GoRoute(
       path: '/reports',
-      builder: (context, state) => const SalesReportScreen(),
+      // Tab utama: pindah tab harus instan tanpa animasi (seperti aplikasi lain)
+      pageBuilder: (context, state) => const NoTransitionPage(
+        child: SalesReportScreen(),
+      ),
     ),
   ],
 );
