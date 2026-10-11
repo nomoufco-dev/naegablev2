@@ -9,6 +9,8 @@ abstract final class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
+      // Font sesuai Figma: sans-serif rounded modern (Plus Jakarta Sans)
+      fontFamily: 'PlusJakartaSans',
       scaffoldBackgroundColor: AppColors.background,
       primaryColor: AppColors.primary,
       colorScheme: const ColorScheme(

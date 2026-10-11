@@ -1,10 +1,12 @@
 import 'dart:ui' show lerpDouble;
 import 'package:flutter/material.dart';
+import '../constants/app_colors.dart';
 import '../constants/app_spacing.dart';
 
-/// Navigation bar melayang berbentuk kapsul:
-/// - State Normal: `design-system/nav 1.png` (Upward dome melengkung ke atas dengan bulatan FAB pink (+) konsentris)
-/// - State Morphing / Terbuka: `design-system/nav 2.png` (Cekungan cradle berlubang ke bawah tempat menempelnya modal)
+/// Navigation bar melayang berbentuk kapsul sesuai Figma:
+/// - State Normal: dome melengkung ke atas dengan bulatan FAB pink (+) konsentris
+/// - State Morphing / Terbuka: cekungan cradle berlubang ke bawah tempat menempelnya modal
+/// - 4 ikon tab putih (selected penuh, inaktif 72% opacity), FAB lingkaran pink.
 class CustomBottomNavBar extends StatelessWidget {
   const CustomBottomNavBar({
     super.key,
@@ -44,11 +46,11 @@ class CustomBottomNavBar extends StatelessWidget {
         clipBehavior: Clip.none,
         alignment: Alignment.bottomCenter,
         children: [
-          // Background Bar Kapsul Melayang Sesuai nav 1.png & nav 2.png
+          // Background Bar Kapsul Melayang
           CustomPaint(
             size: const Size(double.infinity, 78.0),
             painter: _NotchedPillPainter(
-              color: const Color(0xFF3E2D2A), // Deep Espresso Brown nav 1.png
+              color: AppColors.primary, // Cokelat tua sesuai Figma
               morphProgress: progress,
             ),
             child: SizedBox(
@@ -85,7 +87,7 @@ class CustomBottomNavBar extends StatelessWidget {
             ),
           ),
 
-          // Central FAB (+) Sesuai nav 1.png
+          // Central FAB (+) — lingkaran pink menonjol di tengah sesuai Figma
           // Memberikan margin clearance merata di sekeliling bulatan tombol (+)
           if (fabOpacity > 0.0)
             Positioned(
@@ -103,7 +105,7 @@ class CustomBottomNavBar extends StatelessWidget {
                         width: fabRadius * 2,
                         height: fabRadius * 2,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF6CAD4), // Pastel Blush Pink nav 1.png
+                          color: AppColors.blush, // Pink blush sesuai Figma
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
@@ -116,7 +118,7 @@ class CustomBottomNavBar extends StatelessWidget {
                         alignment: Alignment.center,
                         child: const Icon(
                           Icons.add,
-                          color: Color(0xFF3E2D2A), // Dark Brown plus icon nav 1.png
+                          color: AppColors.primary, // Cokelat tua
                           size: 26.0,
                         ),
                       ),
@@ -141,10 +143,10 @@ class CustomBottomNavBar extends StatelessWidget {
       onPressed: () => onItemSelected?.call(index),
       icon: Icon(
         icon,
-        // nav 1.png: ikon pastel pink (#F6CAD4) dengan opacity halus untuk inaktif
+        // Figma: 4 ikon tab putih (inaktif dengan opacity halus)
         color: isSelected
-            ? const Color(0xFFF6CAD4)
-            : const Color(0xFFF6CAD4).withValues(alpha: 0.72),
+            ? Colors.white
+            : Colors.white.withValues(alpha: 0.72),
         size: 24.0,
       ),
     );
