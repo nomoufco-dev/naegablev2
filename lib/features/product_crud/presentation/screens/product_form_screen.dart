@@ -280,6 +280,7 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                               _buildLabel('Kategori'),
                               const SizedBox(height: 6.0),
                               DropdownButtonFormField<String>(
+                                isExpanded: true,
                                 initialValue: _selectedCategoryId,
                                 decoration: _figmaFieldDecoration('Contoh: Soft Cookies'),
                                 items: categories.map((cat) {
