@@ -17,6 +17,9 @@ abstract final class AppBootstrap {
       systemNavigationBarColor: Colors.transparent,
       // Konten bawah terang → ikon nav bar gelap
       systemNavigationBarIconBrightness: Brightness.dark,
+      // Matikan scrim kontras sistem (penyebab bar hitam di MIUI/Android 10+)
+      systemNavigationBarContrastEnforced: false,
+      systemStatusBarContrastEnforced: false,
     ));
 
     // Mempersiapkan database SQLite lokal dan skema tabel awal

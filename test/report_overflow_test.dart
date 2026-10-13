@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pos_naegable/core/di/providers.dart';
-import 'package:pos_naegable/core/domain/entities/order_entity.dart';
 import 'package:pos_naegable/core/domain/repositories/order_repository.dart';
 import 'package:pos_naegable/features/reports/presentation/screens/sales_report_screen.dart';
 
