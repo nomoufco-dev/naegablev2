@@ -117,11 +117,11 @@ class SalesReportScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Kartu hero cokelat (Figma: w=372 h=122 r=20)
+                      // Kartu hero cokelat (Figma: w=372 r=20)
+                      // Tinggi mengikuti konten agar tidak overflow saat teks wrap
                       Container(
                         width: double.infinity,
-                        height: 122.0,
-                        padding: const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 0),
+                        padding: const EdgeInsets.all(15.0),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(20.0),
@@ -316,8 +316,7 @@ class _MetricCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 79.0,
-      padding: const EdgeInsets.fromLTRB(15.0, 15.0, 12.0, 0),
+      padding: const EdgeInsets.all(15.0),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20.0),
