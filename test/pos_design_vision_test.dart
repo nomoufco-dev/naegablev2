@@ -141,6 +141,8 @@ void main() {
               body: QuickManagementModal(
                 onNavigateToProductCrud: () {},
                 onNavigateToCategoryCrud: () {},
+                onNavigateToProductDetail: () {},
+                onNavigateToDeliverySettings: () {},
               ),
             ),
           ),

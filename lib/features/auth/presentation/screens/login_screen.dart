@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/constants/app_assets.dart';
 import '../../../../core/constants/app_colors.dart';
 
 /// Layar Login Naegablé Bakehaus sesuai spesifikasi Figma (DESIGN_SPEC_FIGMA.md):
@@ -55,33 +56,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Header Logo Script & Subtitle Caps
+                  // Logo di atas — gambar logo saja sesuai Figma, tanpa teks
                   Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Text(
-                          'naegablé',
-                          style: TextStyle(
-                            fontFamily: 'serif',
-                            fontSize: 36.0,
-                            fontWeight: FontWeight.bold,
-                            fontStyle: FontStyle.italic,
-                            color: AppColors.primary,
-                            height: 1.0,
-                          ),
-                        ),
-                        SizedBox(height: 4.0),
-                        Text(
-                          'BAKEHAUS',
-                          style: TextStyle(
-                            fontSize: 11.0,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 3.5,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
+                    child: Image.asset(
+                      AppAssets.logoGreyBrown,
+                      height: 84.0,
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.bakery_dining,
+                          size: 64.0,
+                          color: AppColors.primary,
+                        );
+                      },
                     ),
                   ),
                   const SizedBox(height: 32.0),

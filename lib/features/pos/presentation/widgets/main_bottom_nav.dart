@@ -56,6 +56,14 @@ class MainBottomNav extends StatelessWidget {
             MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
           );
         },
+        onNavigateToProductDetail: () {
+          Navigator.of(sheetContext).pop();
+          sheetContext.push('/product-detail');
+        },
+        onNavigateToDeliverySettings: () {
+          Navigator.of(sheetContext).pop();
+          sheetContext.push('/delivery-settings');
+        },
       ),
     );
   }

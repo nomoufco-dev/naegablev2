@@ -233,6 +233,8 @@ void main() {
               child: QuickManagementModal(
                 onNavigateToProductCrud: () {},
                 onNavigateToCategoryCrud: () {},
+                onNavigateToProductDetail: () {},
+                onNavigateToDeliverySettings: () {},
               ),
             ),
           ),

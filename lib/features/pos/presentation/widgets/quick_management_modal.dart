@@ -11,11 +11,15 @@ class QuickManagementModal extends ConsumerWidget {
     super.key,
     required this.onNavigateToProductCrud,
     required this.onNavigateToCategoryCrud,
+    required this.onNavigateToProductDetail,
+    required this.onNavigateToDeliverySettings,
     this.onClose,
   });
 
   final VoidCallback onNavigateToProductCrud;
   final VoidCallback onNavigateToCategoryCrud;
+  final VoidCallback onNavigateToProductDetail;
+  final VoidCallback onNavigateToDeliverySettings;
   final VoidCallback? onClose;
 
   @override
@@ -54,14 +58,12 @@ class QuickManagementModal extends ConsumerWidget {
                 ),
 
                 // 4 Baris Menu Sesuai Figma: Daftar Produk, Detail, Kategori, Pengiriman
+                // Callback sudah menutup modal/sheet sebelum navigasi — jangan pop di sini.
                 // 1. Daftar Produk (Icon: Box)
                 _buildActionPillRow(
                   icon: Icons.inventory_2_outlined,
                   title: 'Daftar Produk',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    onNavigateToProductCrud();
-                  },
+                  onTap: onNavigateToProductCrud,
                 ),
                 const SizedBox(height: 10.0),
 
@@ -69,10 +71,7 @@ class QuickManagementModal extends ConsumerWidget {
                 _buildActionPillRow(
                   icon: Icons.edit_outlined,
                   title: 'Detail',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/product-detail');
-                  },
+                  onTap: onNavigateToProductDetail,
                 ),
                 const SizedBox(height: 10.0),
 
@@ -80,10 +79,7 @@ class QuickManagementModal extends ConsumerWidget {
                 _buildActionPillRow(
                   icon: Icons.grid_view_rounded,
                   title: 'Kategori',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    onNavigateToCategoryCrud();
-                  },
+                  onTap: onNavigateToCategoryCrud,
                 ),
                 const SizedBox(height: 10.0),
 
@@ -91,10 +87,7 @@ class QuickManagementModal extends ConsumerWidget {
                 _buildActionPillRow(
                   icon: Icons.local_shipping_outlined,
                   title: 'Pengiriman',
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushNamed('/delivery-settings');
-                  },
+                  onTap: onNavigateToDeliverySettings,
                 ),
                 const SizedBox(height: 12.0),
 
@@ -165,25 +158,32 @@ class QuickManagementModal extends ConsumerWidget {
             vertical: 10.0,
           ),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFFDF9), // Pale Cream / Soft White
+            color: AppColors.surfaceWhite, // Putih solid sesuai Figma
             borderRadius: BorderRadius.circular(9999),
             boxShadow: const [
               BoxShadow(
-                color: Color(0x0F000000),
-                blurRadius: 4.0,
-                offset: Offset(0, 1),
+                color: Color(0x14000000),
+                blurRadius: 6.0,
+                offset: Offset(0, 2),
               ),
             ],
           ),
           child: Row(
             children: [
-              // Lingkaran Ikon Blush Pink sesuai Figma
+              // Lingkaran Ikon PUTIH sesuai Figma (ikon outline cokelat di dalam)
               Container(
                 width: 38.0,
                 height: 38.0,
                 decoration: const BoxDecoration(
-                  color: AppColors.blush, // #F5CBD7
+                  color: AppColors.surfaceWhite,
                   shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x14000000),
+                      blurRadius: 3.0,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
                 ),
                 child: Icon(
                   icon,
