@@ -1,37 +1,30 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/constants/app_spacing.dart';
-import '../controllers/pos_controller.dart';
 
-/// Modal menu aksi cepat "Kelola Sistem" yang merefleksikan secara presisi visual:
-/// - Bentuk kontainer pink pastel dengan lengkungan lidah U-shape di bagian bawah area close button (✕)
-///   sesuai `design-system/nav 2.png` dan `features/CRUD PRODUCT KATEGORY DELIVERY ON OF.png`.
+/// Modal menu aksi cepat "Kelola Sistem" sesuai Figma:
+/// kontainer pink muda dengan 4 baris menu (Daftar Produk, Detail, Kategori, Pengiriman)
+/// dan tombol tutup lingkaran putih di bawah.
 class QuickManagementModal extends ConsumerWidget {
   const QuickManagementModal({
     super.key,
     required this.onNavigateToProductCrud,
     required this.onNavigateToCategoryCrud,
-    this.onAddNewProduct,
     this.onClose,
   });
 
   final VoidCallback onNavigateToProductCrud;
   final VoidCallback onNavigateToCategoryCrud;
-  final VoidCallback? onAddNewProduct;
   final VoidCallback? onClose;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final deliveryAsync = ref.watch(deliverySettingsControllerProvider);
-    final isDeliveryEnabled = deliveryAsync.value?.isDeliveryEnabled ?? true;
-
     return Container(
       margin: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 6.0),
       child: CustomPaint(
         painter: const _ModalBackgroundPainter(
-          color: AppColors.accent, // Soft Pastel Blush Pink #F5CBD7
+          color: AppColors.modalPink, // Light pink #FDF2F5 sesuai Figma
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(
@@ -46,68 +39,36 @@ class QuickManagementModal extends ConsumerWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header: Judul "Kelola Sistem" & Subjudul untuk aksesibilitas & test
+                // Header: Judul "Kelola Sistem" sesuai Figma
                 Padding(
                   padding: const EdgeInsets.only(left: 6.0, bottom: 14.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Kelola Sistem',
-                            style: TextStyle(
-                              fontSize: 18.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
-                              letterSpacing: 0.2,
-                            ),
-                          ),
-                          Text(
-                            'Menu Manajemen Kasir',
-                            style: TextStyle(
-                              fontSize: 11.0,
-                              fontWeight: FontWeight.w500,
-                              color: Color(0xFF6B5C57),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        width: 36.0,
-                        height: 4.0,
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceWhite.withValues(alpha: 0.7),
-                          borderRadius: BorderRadius.circular(4.0),
-                        ),
-                      ),
-                    ],
+                  child: const Text(
+                    'Kelola Sistem',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.noir,
+                      letterSpacing: 0.2,
+                    ),
                   ),
                 ),
 
-                // 4 Baris Opsi Kapsul Sesuai Desain CRUD
-                // 1. Tambah (Icon: 3D Box dengan +)
+                // 4 Baris Menu Sesuai Figma: Daftar Produk, Detail, Kategori, Pengiriman
+                // 1. Daftar Produk (Icon: Box)
                 _buildActionPillRow(
-                  icon: Icons.add_box_outlined,
-                  title: 'Tambah',
-                  subtitle: 'Kelola Produk',
+                  icon: Icons.inventory_2_outlined,
+                  title: 'Daftar Produk',
                   onTap: () {
                     Navigator.of(context).pop();
-                    if (onAddNewProduct != null) {
-                      onAddNewProduct!();
-                    } else {
-                      onNavigateToProductCrud();
-                    }
+                    onNavigateToProductCrud();
                   },
                 ),
                 const SizedBox(height: 10.0),
 
-                // 2. Detail (Icon: Dokumen dengan Pensil)
+                // 2. Detail (Icon: Pensil)
                 _buildActionPillRow(
-                  icon: Icons.edit_note_outlined,
+                  icon: Icons.edit_outlined,
                   title: 'Detail',
-                  subtitle: 'Detail & Edit Menu',
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pushNamed('/product-detail');
@@ -115,11 +76,10 @@ class QuickManagementModal extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10.0),
 
-                // 3. Kategori (Icon: 2x2 Grid Kotak)
+                // 3. Kategori (Icon: 2x2 Grid)
                 _buildActionPillRow(
                   icon: Icons.grid_view_rounded,
                   title: 'Kategori',
-                  subtitle: 'Kelola Kategori',
                   onTap: () {
                     Navigator.of(context).pop();
                     onNavigateToCategoryCrud();
@@ -127,32 +87,14 @@ class QuickManagementModal extends ConsumerWidget {
                 ),
                 const SizedBox(height: 10.0),
 
-                // 4. Pengiriman (Icon: Truk Pengiriman dengan Switch ON/OFF)
+                // 4. Pengiriman (Icon: Truk)
                 _buildActionPillRow(
                   icon: Icons.local_shipping_outlined,
                   title: 'Pengiriman',
-                  subtitle: 'Layanan Pengiriman',
                   onTap: () {
                     Navigator.of(context).pop();
                     Navigator.of(context).pushNamed('/delivery-settings');
                   },
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CupertinoSwitch(
-                        value: isDeliveryEnabled,
-                        activeTrackColor: AppColors.success,
-                        onChanged: (_) {
-                          ref.read(deliverySettingsControllerProvider.notifier).toggleDelivery();
-                        },
-                      ),
-                      const Icon(
-                        Icons.chevron_right,
-                        color: AppColors.primary,
-                        size: 20.0,
-                      ),
-                    ],
-                  ),
                 ),
                 const SizedBox(height: 12.0),
 
@@ -210,9 +152,7 @@ class QuickManagementModal extends ConsumerWidget {
   Widget _buildActionPillRow({
     required IconData icon,
     required String title,
-    required String subtitle,
     required VoidCallback onTap,
-    Widget? trailing,
   }) {
     return Material(
       color: Colors.transparent,
@@ -222,7 +162,7 @@ class QuickManagementModal extends ConsumerWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: 14.0,
-            vertical: 9.0,
+            vertical: 10.0,
           ),
           decoration: BoxDecoration(
             color: const Color(0xFFFFFDF9), // Pale Cream / Soft White
@@ -237,20 +177,13 @@ class QuickManagementModal extends ConsumerWidget {
           ),
           child: Row(
             children: [
-              // Lingkaran Ikon Putih Bersih di Sisi Kiri
+              // Lingkaran Ikon Blush Pink sesuai Figma
               Container(
                 width: 38.0,
                 height: 38.0,
                 decoration: const BoxDecoration(
-                  color: AppColors.surfaceWhite,
+                  color: AppColors.blush, // #F5CBD7
                   shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x14000000),
-                      blurRadius: 3.0,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
                 ),
                 child: Icon(
                   icon,
@@ -260,41 +193,24 @@ class QuickManagementModal extends ConsumerWidget {
               ),
               const SizedBox(width: 12.0),
 
-              // Teks Label & Keterangan
+              // Label Menu
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.noir,
-                      ),
-                    ),
-                    const SizedBox(height: 1.5),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        fontSize: 11.0,
-                        fontWeight: FontWeight.w400,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.noir,
+                  ),
                 ),
               ),
 
-              // Elemen Kanan: Trailing khusus atau Chevron '>'
-              trailing ??
-                  const Icon(
-                    Icons.chevron_right,
-                    color: AppColors.primary,
-                    size: 20.0,
-                  ),
+              // Chevron '>'
+              const Icon(
+                Icons.chevron_right,
+                color: AppColors.primary,
+                size: 20.0,
+              ),
             ],
           ),
         ),

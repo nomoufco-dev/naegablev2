@@ -110,114 +110,120 @@ class CategoryManagementScreen extends ConsumerWidget {
     final categoriesAsync = ref.watch(categoriesListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        title: const Text('Kelola Kategori Menu'),
+        title: const Text('Kelola Kategori'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnDark,
-        actions: [
-          IconButton(
-            onPressed: () => _openCategoryForm(context, ref),
-            icon: const Icon(Icons.add),
-            tooltip: 'Tambah Kategori',
-          ),
-        ],
+        centerTitle: true,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 18.0),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      body: categoriesAsync.when(
-        data: (categories) {
-          if (categories.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.category_outlined,
-                    size: 64.0,
-                    color: AppColors.textSecondary.withValues(alpha: 0.5),
-                  ),
-                  const SizedBox(height: 12.0),
-                  const Text(
-                    'Belum ada kategori.',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: categoriesAsync.when(
+                data: (categories) {
+                  if (categories.isEmpty) {
+                    // Empty state sesuai Figma: teks abu-abu terpusat
+                    return const Center(
+                      child: Text(
+                        'Belum ada kategori',
+                        style: TextStyle(
+                          fontSize: 14.0,
+                          color: Color(0xFF9E9E9E),
+                        ),
+                      ),
+                    );
+                  }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            itemCount: categories.length,
-            separatorBuilder: (context, index) => const SizedBox(height: 8.0),
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              return Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceWhite,
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(color: const Color(0xFFE2DDD7)),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 36.0,
-                      height: 36.0,
-                      decoration: BoxDecoration(
-                        color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: const Icon(Icons.category_outlined, color: AppColors.primary, size: 20.0),
-                    ),
-                    const SizedBox(width: 12.0),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            cat.name,
-                            style: const TextStyle(
-                              fontSize: 14.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
+                  return ListView.separated(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    itemCount: categories.length,
+                    separatorBuilder: (context, index) => const SizedBox(height: 8.0),
+                    itemBuilder: (context, index) {
+                      final cat = categories[index];
+                      return Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceWhite,
+                          borderRadius: BorderRadius.circular(12.0),
+                          border: Border.all(color: const Color(0xFFE2DDD7)),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 36.0,
+                              height: 36.0,
+                              decoration: BoxDecoration(
+                                color: AppColors.blush,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              child: const Icon(Icons.category_outlined, color: AppColors.primary, size: 20.0),
                             ),
-                          ),
-                          Text(
-                            cat.slug,
-                            style: const TextStyle(
-                              fontSize: 11.0,
-                              color: AppColors.textSecondary,
+                            const SizedBox(width: 12.0),
+                            Expanded(
+                              child: Text(
+                                cat.name,
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.noir,
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                            IconButton(
+                              onPressed: () => _openCategoryForm(context, ref, cat),
+                              icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20.0),
+                            ),
+                            IconButton(
+                              onPressed: () => _confirmDelete(context, ref, cat),
+                              icon: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20.0),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                error: (err, _) => Center(child: Text('Error: $err')),
+              ),
+            ),
+
+            // Tombol "Tambah Kategori" cokelat di bawah sesuai Figma
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50.0,
+                child: ElevatedButton(
+                  onPressed: () => _openCategoryForm(context, ref),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.surfaceWhite,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(9999),
                     ),
-                    IconButton(
-                      onPressed: () => _openCategoryForm(context, ref, cat),
-                      icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20.0),
+                  ),
+                  child: const Text(
+                    'Tambah Kategori',
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.surfaceWhite,
                     ),
-                    IconButton(
-                      onPressed: () => _confirmDelete(context, ref, cat),
-                      icon: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20.0),
-                    ),
-                  ],
+                  ),
                 ),
-              );
-            },
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-        error: (err, _) => Center(child: Text('Error: $err')),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _openCategoryForm(context, ref),
-        backgroundColor: AppColors.accent,
-        foregroundColor: AppColors.primary,
-        tooltip: 'Tambah Kategori',
-        child: const Icon(Icons.add, size: 28.0),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -279,12 +279,6 @@ class _PosScreenState extends ConsumerState<PosScreen> with SingleTickerProvider
                             MaterialPageRoute(builder: (_) => const CategoryManagementScreen()),
                           );
                         },
-                        onAddNewProduct: () {
-                          _closeQuickManagementSheet();
-                          Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const ProductManagementScreen()),
-                          );
-                        },
                       ),
                     ),
                   ),

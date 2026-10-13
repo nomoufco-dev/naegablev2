@@ -177,13 +177,13 @@ void main() {
     await tester.tap(navFabFinder);
     await tester.pumpAndSettle();
 
-    // 6. Verify QuickManagementModal (features/CRUD PRODUCT KATEGORY DELIVERY ON OF.png)
+    // 6. Verify QuickManagementModal sesuai Figma
     expect(find.byType(QuickManagementModal), findsOneWidget);
-    expect(find.text('Menu Manajemen Kasir'), findsOneWidget);
-    expect(find.text('Kelola Produk'), findsOneWidget);
-    expect(find.text('Kelola Kategori'), findsOneWidget);
-    expect(find.text('Tipe Pesanan'), findsOneWidget);
-    expect(find.text('Layanan Pengiriman'), findsOneWidget);
+    expect(find.text('Kelola Sistem'), findsOneWidget);
+    expect(find.text('Daftar Produk'), findsOneWidget);
+    expect(find.text('Detail'), findsOneWidget);
+    expect(find.text('Kategori'), findsOneWidget);
+    expect(find.text('Pengiriman'), findsOneWidget);
     expect(find.byIcon(Icons.local_shipping_outlined), findsOneWidget);
     expect(find.byIcon(Icons.close), findsOneWidget);
 

@@ -22,6 +22,8 @@ class ProductDetailManagementScreen extends ConsumerStatefulWidget {
 class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchFilter = '';
+  // 0 = Semua, 1 = Aktif, 2 = Nonaktif (sesuai tab Figma)
+  int _selectedTab = 0;
 
   @override
   void dispose() {
@@ -41,7 +43,7 @@ class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailMan
     final productsAsync = ref.watch(productsListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.cream,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
         title: const Text('Detail Produk'),
         backgroundColor: AppColors.primary,
@@ -62,26 +64,7 @@ class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailMan
       body: SafeArea(
         child: Column(
           children: [
-            // Section 1: Chip Statistik
-            Container(
-              color: AppColors.surfaceWhite,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _buildStatChip('2 Terjual', Icons.local_fire_department_outlined),
-                    const SizedBox(width: 8.0),
-                    _buildStatChip('6 Total Produk', Icons.inventory_2_outlined),
-                    const SizedBox(width: 8.0),
-                    _buildStatChip('Stok Melimpah', Icons.check_circle_outline),
-                  ],
-                ),
-              ),
-            ),
-            const Divider(height: 1.0, color: Color(0xFFEAE5E0)),
-
-            // Section 2: Search Bar
+            // Search Bar sesuai Figma
             Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: TextField(
@@ -90,20 +73,52 @@ class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailMan
                   setState(() => _searchFilter = val.toLowerCase());
                 },
                 decoration: InputDecoration(
-                  hintText: 'Cari detail produk...',
-                  prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                  hintText: 'Cari produk...',
+                  hintStyle: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 13.0),
+                  suffixIcon: const Icon(Icons.search, color: AppColors.noir),
                   filled: true,
                   fillColor: AppColors.surfaceWhite,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                    borderSide: const BorderSide(color: Color(0xFFE2E2E2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(9999),
-                    borderSide: BorderSide.none,
+                    borderSide: const BorderSide(color: Color(0xFFE2E2E2)),
                   ),
                 ),
               ),
             ),
 
-            // Section 3: Lists (Aktif vs Nonaktif)
+            // Tab chip Semua / Aktif / Nonaktif sesuai Figma
+            productsAsync.when(
+              data: (products) {
+                final filtered = products.where((p) => p.name.toLowerCase().contains(_searchFilter)).toList();
+                final activeCount = filtered.where((p) => p.isAvailable).length;
+                final inactiveCount = filtered.where((p) => !p.isAvailable).length;
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 8.0),
+                  child: Row(
+                    children: [
+                      _buildTabChip('Semua', filtered.length, 0),
+                      const SizedBox(width: 8.0),
+                      _buildTabChip('Aktif', activeCount, 1),
+                      const SizedBox(width: 8.0),
+                      _buildTabChip('Nonaktif', inactiveCount, 2),
+                    ],
+                  ),
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
+            ),
+
+            // Daftar produk
             Expanded(
               child: productsAsync.when(
                 data: (products) {
@@ -111,48 +126,51 @@ class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailMan
                   final activeProducts = filtered.where((p) => p.isAvailable).toList();
                   final inactiveProducts = filtered.where((p) => !p.isAvailable).toList();
 
+                  final showActive = _selectedTab == 0 || _selectedTab == 1;
+                  final showInactive = _selectedTab == 0 || _selectedTab == 2;
+
                   return SingleChildScrollView(
-                    padding: const EdgeInsets.fromLTRB(16.0, 0, 16.0, 32.0),
+                    padding: const EdgeInsets.fromLTRB(16.0, 4.0, 16.0, 32.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Seksi Produk Aktif
-                        const Text(
-                          'Produk Aktif',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.noir,
+                        if (showActive) ...[
+                          const Text(
+                            'Aktif',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.noir,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        if (activeProducts.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text('Tidak ada produk aktif.', style: TextStyle(color: AppColors.textSecondary)),
-                          )
-                        else
-                          ...activeProducts.map((p) => _buildProductDetailCard(p, true)),
-
-                        const SizedBox(height: 20.0),
-
-                        // Seksi Produk Nonaktif
-                        const Text(
-                          'Nonaktif',
-                          style: TextStyle(
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.textSecondary,
+                          const SizedBox(height: 8.0),
+                          if (activeProducts.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text('Tidak ada produk aktif.', style: TextStyle(color: AppColors.textSecondary)),
+                            )
+                          else
+                            ...activeProducts.map((p) => _buildProductDetailCard(p)),
+                          const SizedBox(height: 16.0),
+                        ],
+                        if (showInactive) ...[
+                          const Text(
+                            'Nonaktif',
+                            style: TextStyle(
+                              fontSize: 14.0,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.noir,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8.0),
-                        if (inactiveProducts.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 8.0),
-                            child: Text('Tidak ada produk nonaktif.', style: TextStyle(color: AppColors.textSecondary)),
-                          )
-                        else
-                          ...inactiveProducts.map((p) => _buildProductDetailCard(p, false)),
+                          const SizedBox(height: 8.0),
+                          if (inactiveProducts.isEmpty)
+                            const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text('Tidak ada produk nonaktif.', style: TextStyle(color: AppColors.textSecondary)),
+                            )
+                          else
+                            ...inactiveProducts.map((p) => _buildProductDetailCard(p)),
+                        ],
                       ],
                     ),
                   );
@@ -167,38 +185,52 @@ class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailMan
     );
   }
 
-  Widget _buildStatChip(String label, IconData icon) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
-      decoration: BoxDecoration(
-        color: AppColors.blush,
-        borderRadius: BorderRadius.circular(9999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16.0, color: AppColors.primary),
-          const SizedBox(width: 6.0),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 12.0,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
+  /// Chip tab filter sesuai Figma: hitungan + label, aktif = cokelat.
+  Widget _buildTabChip(String label, int count, int index) {
+    final isSelected = _selectedTab == index;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedTab = index),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : const Color(0xFFF1F1F1),
+            borderRadius: BorderRadius.circular(12.0),
           ),
-        ],
+          child: Column(
+            children: [
+              Text(
+                '$count',
+                style: TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  color: isSelected ? AppColors.surfaceWhite : AppColors.noir,
+                ),
+              ),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 11.0,
+                  color: isSelected ? AppColors.surfaceWhite : AppColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildProductDetailCard(ProductEntity product, bool isActive) {
+  /// Kartu produk sesuai Figma: gambar + info di atas, baris "Aktif"/toggle di bawah kanan.
+  Widget _buildProductDetailCard(ProductEntity product) {
+    final isActive = product.isAvailable;
     return Container(
       margin: const EdgeInsets.only(bottom: 10.0),
       padding: const EdgeInsets.all(14.0),
       decoration: BoxDecoration(
         color: AppColors.surfaceWhite,
         borderRadius: BorderRadius.circular(16.0),
+        border: Border.all(color: const Color(0xFFEAE5E0)),
         boxShadow: const [
           BoxShadow(
             color: Color(0x0A000000),
@@ -207,60 +239,81 @@ class _ProductDetailManagementScreenState extends ConsumerState<ProductDetailMan
           ),
         ],
       ),
-      child: Row(
+      child: Column(
         children: [
-          // Gambar Produk / Icon
-          Container(
-            width: 48.0,
-            height: 48.0,
-            decoration: BoxDecoration(
-              color: AppColors.cream,
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: const Icon(Icons.bakery_dining, color: AppColors.primary, size: 26.0),
-          ),
-          const SizedBox(width: 12.0),
-
-          // Detail Produk
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: isActive ? AppColors.noir : AppColors.textSecondary,
-                  ),
+          Row(
+            children: [
+              // Gambar Produk
+              Container(
+                width: 52.0,
+                height: 52.0,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF7F3EE),
+                  borderRadius: BorderRadius.circular(12.0),
                 ),
-                const SizedBox(height: 2.0),
-                Text(
-                  '${CurrencyFormatter.format(product.price)} • Stok: ${product.currentStock}',
-                  style: const TextStyle(
-                    fontSize: 12.0,
-                    color: AppColors.textSecondary,
-                  ),
+                child: const Icon(Icons.bakery_dining, color: AppColors.primary, size: 28.0),
+              ),
+              const SizedBox(width: 12.0),
+              // Info multi-baris sesuai Figma
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      style: const TextStyle(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.noir,
+                      ),
+                    ),
+                    const SizedBox(height: 3.0),
+                    Text(
+                      'Beli ${CurrencyFormatter.format(product.costPrice)}',
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.noir,
+                      ),
+                    ),
+                    Text(
+                      'Jual ${CurrencyFormatter.format(product.price)}',
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.noir,
+                      ),
+                    ),
+                    Text(
+                      'Stok ${product.currentStock}',
+                      style: const TextStyle(
+                        fontSize: 12.0,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
-
-          // Toggle Status Aktif / Nonaktif
-          Column(
+          const SizedBox(height: 8.0),
+          // Baris status + toggle di kanan bawah sesuai Figma
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
                 isActive ? 'Aktif' : 'Nonaktif',
-                style: TextStyle(
-                  fontSize: 10.0,
+                style: const TextStyle(
+                  fontSize: 12.0,
                   fontWeight: FontWeight.bold,
-                  color: isActive ? const Color(0xFF2E9E5B) : AppColors.textSecondary,
+                  color: AppColors.noir,
                 ),
               ),
+              const SizedBox(width: 8.0),
               Transform.scale(
-                scale: 0.8,
+                scale: 0.85,
                 child: CupertinoSwitch(
-                  value: product.isAvailable,
+                  value: isActive,
                   activeTrackColor: AppColors.primary,
                   onChanged: (_) => _toggleProductAvailability(product),
                 ),

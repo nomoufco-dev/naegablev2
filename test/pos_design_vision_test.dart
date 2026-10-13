@@ -148,7 +148,7 @@ void main() {
       );
 
       expect(find.text('Kelola Sistem'), findsOneWidget);
-      expect(find.text('Tambah'), findsOneWidget);
+      expect(find.text('Daftar Produk'), findsOneWidget);
       expect(find.text('Detail'), findsOneWidget);
       expect(find.text('Kategori'), findsOneWidget);
       expect(find.text('Pengiriman'), findsOneWidget);

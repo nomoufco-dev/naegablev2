@@ -27,7 +27,7 @@ class _DeliverySettingsScreenState extends ConsumerState<DeliverySettingsScreen>
     _doEnabled = deliveryAsync.value?.isDeliveryEnabled ?? true;
 
     return Scaffold(
-      backgroundColor: AppColors.cream,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
         title: const Text('Pengaturan Pengiriman'),
         backgroundColor: AppColors.primary,
@@ -51,23 +51,10 @@ class _DeliverySettingsScreenState extends ConsumerState<DeliverySettingsScreen>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 8.0),
-                child: Text(
-                  'Metode Pengiriman Aktif',
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.noir,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8.0),
-
-              // 1. Delivery Order (DO)
+              // 1. Delivery Order (DO) — sesuai Figma
               _buildMethodToggleTile(
                 title: 'Delivery Order (DO)',
-                subtitle: 'Pengiriman kurir toko langsung ke alamat pelanggan',
+                subtitle: 'Kirim via kurir Gojek/Grab/Shopee Instant',
                 icon: Icons.local_shipping_outlined,
                 value: _doEnabled,
                 onChanged: (val) {
@@ -76,11 +63,11 @@ class _DeliverySettingsScreenState extends ConsumerState<DeliverySettingsScreen>
               ),
               const SizedBox(height: 12.0),
 
-              // 2. Cash on Delivery (COD)
+              // 2. Cash on Delivery (COD) — sesuai Figma
               _buildMethodToggleTile(
                 title: 'Cash on Delivery (COD)',
-                subtitle: 'Pembayaran tunai saat barang diterima di tempat',
-                icon: Icons.payments_outlined,
+                subtitle: 'Bayar di tempat (Alun-Alun Kota Mojokerto)',
+                icon: Icons.handshake_outlined,
                 value: _codEnabled,
                 onChanged: (val) {
                   setState(() => _codEnabled = val);
@@ -88,10 +75,10 @@ class _DeliverySettingsScreenState extends ConsumerState<DeliverySettingsScreen>
               ),
               const SizedBox(height: 12.0),
 
-              // 3. Self Pick-Up
+              // 3. Self Pick-Up — sesuai Figma
               _buildMethodToggleTile(
                 title: 'Self Pick-Up',
-                subtitle: 'Pelanggan mengambil sendiri pesanan di outlet',
+                subtitle: 'Pembeli mengambil sendiri ke tempat',
                 icon: Icons.storefront_outlined,
                 value: _selfPickupEnabled,
                 onChanged: (val) {
@@ -127,15 +114,8 @@ class _DeliverySettingsScreenState extends ConsumerState<DeliverySettingsScreen>
       ),
       child: Row(
         children: [
-          Container(
-            width: 44.0,
-            height: 44.0,
-            decoration: BoxDecoration(
-              color: AppColors.blush,
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Icon(icon, color: AppColors.primary, size: 22.0),
-          ),
+          // Ikon outline sesuai Figma (tanpa kotak latar)
+          Icon(icon, color: AppColors.noir, size: 26.0),
           const SizedBox(width: 14.0),
           Expanded(
             child: Column(

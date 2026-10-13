@@ -119,9 +119,9 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
     final isEdit = widget.existingProduct != null;
 
     return Scaffold(
-      backgroundColor: AppColors.cream,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
-        title: Text(isEdit ? 'Ubah Produk' : 'Tambah Produk Baru'),
+        title: Text(isEdit ? 'Ubah Produk' : 'Tambah Produk'),
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.surfaceWhite,
         centerTitle: true,
@@ -146,262 +146,164 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Form Card Container
-                    Container(
-                      padding: const EdgeInsets.all(20.0),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceWhite,
-                        borderRadius: BorderRadius.circular(20.0),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0A000000),
-                            blurRadius: 8.0,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 1. Nama Produk
-                          const Text(
-                            'Nama Produk',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
-                            ),
-                          ),
-                          const SizedBox(height: 6.0),
-                          TextField(
-                            controller: _nameController,
-                            decoration: InputDecoration(
-                              hintText: 'Contoh: Dubai Chewy Cookie',
-                              filled: true,
-                              fillColor: AppColors.cream,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
+                    // 1. Nama Produk
+                    _buildLabel('Nama Produk'),
+                    const SizedBox(height: 6.0),
+                    _buildTextField(
+                      controller: _nameController,
+                      hint: 'Contoh: Soft Cookies',
+                    ),
+                    const SizedBox(height: 16.0),
 
-                          // 2. Harga Beli & Harga Jual Berdampingan (Prefix Rp0)
-                          Row(
+                    // 2. Harga Beli & Harga Jual berdampingan
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Harga Beli',
-                                      style: TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.noir,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6.0),
-                                    TextField(
-                                      controller: _costPriceController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        prefixText: 'Rp0 ',
-                                        prefixStyle: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-                                        filled: true,
-                                        fillColor: AppColors.cream,
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(width: 12.0),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Harga Jual',
-                                      style: TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.bold,
-                                        color: AppColors.noir,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6.0),
-                                    TextField(
-                                      controller: _priceController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                        prefixText: 'Rp0 ',
-                                        prefixStyle: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
-                                        filled: true,
-                                        fillColor: AppColors.cream,
-                                        contentPadding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(12.0),
-                                          borderSide: BorderSide.none,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                              _buildLabel('Harga Beli'),
+                              const SizedBox(height: 6.0),
+                              _buildTextField(
+                                controller: _costPriceController,
+                                hint: 'Rp0',
+                                keyboardType: TextInputType.number,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16.0),
-
-                          // 3. Stok Produk
-                          const Text(
-                            'Stok Produk',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
-                            ),
-                          ),
-                          const SizedBox(height: 6.0),
-                          TextField(
-                            controller: _stockController,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: '100',
-                              filled: true,
-                              fillColor: AppColors.cream,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 16.0),
-
-                          // 4. Kategori Dropdown
-                          const Text(
-                            'Kategori',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
-                            ),
-                          ),
-                          const SizedBox(height: 6.0),
-                          DropdownButtonFormField<String>(
-                            initialValue: _selectedCategoryId,
-                            decoration: InputDecoration(
-                              filled: true,
-                              fillColor: AppColors.cream,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12.0),
-                                borderSide: BorderSide.none,
-                              ),
-                            ),
-                            items: categories.map((cat) {
-                              return DropdownMenuItem(
-                                value: cat.id,
-                                child: Text(cat.name, style: const TextStyle(fontSize: 13.5)),
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              setState(() => _selectedCategoryId = val);
-                            },
-                          ),
-                          const SizedBox(height: 16.0),
-
-                          // 5. Gambar (Tombol Kamera & Galeri)
-                          const Text(
-                            'Gambar Produk',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          Row(
+                        ),
+                        const SizedBox(width: 12.0),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: AppColors.primary, width: 1.2),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                  ),
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Membuka Kamera...')),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.camera_alt_outlined, size: 18.0, color: AppColors.primary),
-                                  label: const Text(
-                                    'Kamera',
-                                    style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: AppColors.primary),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12.0),
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  style: OutlinedButton.styleFrom(
-                                    side: const BorderSide(color: AppColors.primary, width: 1.2),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.0),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(vertical: 12.0),
-                                  ),
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Membuka Galeri...')),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.photo_library_outlined, size: 18.0, color: AppColors.primary),
-                                  label: const Text(
-                                    'Galeri',
-                                    style: TextStyle(fontSize: 13.0, fontWeight: FontWeight.bold, color: AppColors.primary),
-                                  ),
-                                ),
+                              _buildLabel('Harga Jual'),
+                              const SizedBox(height: 6.0),
+                              _buildTextField(
+                                controller: _priceController,
+                                hint: 'Rp0',
+                                keyboardType: TextInputType.number,
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16.0),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
 
-                          // 6. Deskripsi Produk Textarea
-                          const Text(
-                            'Deskripsi Produk',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.noir,
-                            ),
-                          ),
-                          const SizedBox(height: 6.0),
-                          TextField(
-                            controller: _descriptionController,
-                            maxLines: 4,
-                            decoration: InputDecoration(
-                              hintText: 'Tuliskan deskripsi produk bakery...',
-                              filled: true,
-                              fillColor: AppColors.cream,
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                              border: OutlineInputBorder(
+                    // 3. Stok
+                    _buildLabel('Stok'),
+                    const SizedBox(height: 6.0),
+                    _buildTextField(
+                      controller: _stockController,
+                      hint: 'Stok Produk',
+                      keyboardType: TextInputType.number,
+                    ),
+                    const SizedBox(height: 16.0),
+
+                    // 4. Gambar (kiri) + Kategori (kanan) berdampingan
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Kolom kiri: Gambar + Kamera + Galeri
+                        Column(
+                          children: [
+                            Container(
+                              width: 110.0,
+                              height: 110.0,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF1F1F1),
                                 borderRadius: BorderRadius.circular(12.0),
-                                borderSide: BorderSide.none,
+                              ),
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'Gambar',
+                                style: TextStyle(
+                                  fontSize: 13.0,
+                                  fontWeight: FontWeight.w500,
+                                  color: AppColors.noir,
+                                ),
                               ),
                             ),
+                            const SizedBox(height: 10.0),
+                            SizedBox(
+                              width: 110.0,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: AppColors.noir, width: 1.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9999),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                ),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Membuka Kamera...')),
+                                  );
+                                },
+                                child: const Text(
+                                  'Kamera',
+                                  style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w600, color: AppColors.noir),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8.0),
+                            SizedBox(
+                              width: 110.0,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: AppColors.noir, width: 1.0),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(9999),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                ),
+                                onPressed: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Membuka Galeri...')),
+                                  );
+                                },
+                                child: const Text(
+                                  'Galeri',
+                                  style: TextStyle(fontSize: 12.0, fontWeight: FontWeight.w600, color: AppColors.noir),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(width: 14.0),
+                        // Kolom kanan: Kategori + Deskripsi
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildLabel('Kategori'),
+                              const SizedBox(height: 6.0),
+                              DropdownButtonFormField<String>(
+                                initialValue: _selectedCategoryId,
+                                decoration: _figmaFieldDecoration('Contoh: Soft Cookies'),
+                                items: categories.map((cat) {
+                                  return DropdownMenuItem(
+                                    value: cat.id,
+                                    child: Text(cat.name, style: const TextStyle(fontSize: 13.5)),
+                                  );
+                                }).toList(),
+                                onChanged: (val) {
+                                  setState(() => _selectedCategoryId = val);
+                                },
+                              ),
+                              const SizedBox(height: 14.0),
+                              _buildLabel('Deskripsi Produk'),
+                              const SizedBox(height: 6.0),
+                              _buildTextField(
+                                controller: _descriptionController,
+                                hint: 'Deskripsikan produk kamu',
+                                maxLines: 4,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -447,6 +349,56 @@ class _ProductFormScreenState extends ConsumerState<ProductFormScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Label field sesuai Figma: teks hitam bold 13px.
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontSize: 13.0,
+        fontWeight: FontWeight.bold,
+        color: AppColors.noir,
+      ),
+    );
+  }
+
+  /// Field teks sesuai Figma: putih dengan border abu terang, radius 12.
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String hint,
+    TextInputType? keyboardType,
+    int maxLines = 1,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      decoration: _figmaFieldDecoration(hint),
+    );
+  }
+
+  /// Dekorasi field Figma yang dipakai ulang TextField & Dropdown.
+  InputDecoration _figmaFieldDecoration(String hint) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 13.0),
+      filled: true,
+      fillColor: AppColors.surfaceWhite,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: const BorderSide(color: Color(0xFFE2E2E2), width: 1.0),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12.0),
+        borderSide: const BorderSide(color: Color(0xFFE2E2E2), width: 1.0),
       ),
     );
   }

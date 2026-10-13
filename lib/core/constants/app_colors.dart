@@ -14,6 +14,10 @@ abstract final class AppColors {
   static const Color accent = Color(0xFFF5CBD7);
   static const Color blush = Color(0xFFF5CBD7);
 
+  /// Pink muda (#FDF2F5): Latar modal "Kelola Sistem" sesuai Figma —
+  /// lebih terang dari blush, lingkaran ikon tetap blush #F5CBD7.
+  static const Color modalPink = Color(0xFFFDF2F5);
+
   /// Cream (#FFF7EC): Warna aksen latar sekunder.
   static const Color cream = Color(0xFFFFF7EC);
 

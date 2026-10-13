@@ -124,7 +124,7 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
     final productsAsync = ref.watch(productsListProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.cream,
+      backgroundColor: AppColors.surfaceWhite,
       appBar: AppBar(
         title: const Text('Daftar Produk'),
         backgroundColor: AppColors.primary,
@@ -145,7 +145,7 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
       body: SafeArea(
         child: Column(
           children: [
-            // Search Bar
+            // Search Bar sesuai Figma: ikon di kanan
             Padding(
               padding: const EdgeInsets.all(AppSpacing.md),
               child: TextField(
@@ -154,14 +154,23 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
                   setState(() => _searchFilter = val.toLowerCase());
                 },
                 decoration: InputDecoration(
-                  hintText: 'Cari produk bakery...',
-                  prefixIcon: const Icon(Icons.search, color: AppColors.primary),
+                  hintText: 'Cari produk...',
+                  hintStyle: const TextStyle(color: Color(0xFFB0B0B0), fontSize: 13.0),
+                  suffixIcon: const Icon(Icons.search, color: AppColors.noir),
                   filled: true,
                   fillColor: AppColors.surfaceWhite,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                    borderSide: const BorderSide(color: Color(0xFFE2E2E2)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(9999),
+                    borderSide: const BorderSide(color: AppColors.primary),
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(9999),
-                    borderSide: BorderSide.none,
+                    borderSide: const BorderSide(color: Color(0xFFE2E2E2)),
                   ),
                 ),
               ),
@@ -217,7 +226,7 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
                             ),
                             const SizedBox(width: 12.0),
 
-                            // Info Nama & "Beli Rp14.000 / Jual Rp28.000 / Stok: 99"
+                            // Info Nama & harga multi-baris sesuai Figma
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -225,17 +234,32 @@ class _ProductManagementScreenState extends ConsumerState<ProductManagementScree
                                   Text(
                                     item.name,
                                     style: const TextStyle(
-                                      fontSize: 14.5,
+                                      fontSize: 14.0,
                                       fontWeight: FontWeight.bold,
                                       color: AppColors.noir,
                                     ),
                                   ),
-                                  const SizedBox(height: 4.0),
+                                  const SizedBox(height: 3.0),
                                   Text(
-                                    'Beli $costPriceFormatted / Jual $sellPriceFormatted / Stok: ${item.currentStock}',
-                                    maxLines: 2,
+                                    'Beli $costPriceFormatted',
                                     style: const TextStyle(
-                                      fontSize: 11.5,
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.noir,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Jual $sellPriceFormatted',
+                                    style: const TextStyle(
+                                      fontSize: 12.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.noir,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Stok ${item.currentStock}',
+                                    style: const TextStyle(
+                                      fontSize: 12.0,
                                       color: AppColors.textSecondary,
                                     ),
                                   ),
